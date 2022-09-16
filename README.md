@@ -26,7 +26,7 @@ client = HttpPublic(APEX_HTTP_TEST)
 ```
 ### Public endpoints
 You can get no authentication information from public endpoints.  
-Please refer to [demo_public](https://github.com/ApeX-Protocol/apexpro-openapi/tree/main/tests/demo_public.py)
+Please refer to [demo_public](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_public.py)
 
 ```python
 from apexpro.constants import APEX_HTTP_TEST
@@ -45,7 +45,7 @@ print(client.history_funding(symbol="ETH-USDC",limit=100,page=0,beginTimeInclusi
 
 ### Register  method
 You can get stark_key_pair, apiKey,and accountId for private Api , create-order and withdraw  
-Please refer to [demo_register](https://github.com/ApeX-Protocol/apexpro-openapi/tree/main/test/demo_register.py)
+Please refer to [demo_register](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_register.py)
 
 ```python
 from apexpro.http_private import HttpPrivate
@@ -72,7 +72,7 @@ print(regRes['data']['apiKey'])
 
 ### Private endpoints
 some authentication information is required to access private endpoints. 
-Please refer to [demo_private](https://github.com/ApeX-Protocol/apexpro-openapi/tree/main/test/demo_private.py)
+Please refer to [demo_private](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_private.py)
 
 ```python
 from apexpro.http_private import HttpPrivate
@@ -116,7 +116,7 @@ Several endpoints require a starkKey signature authentication, namely as followi
 - create-order
 - withdraw
 
-Please refer to [demo_stark_key_sign](https://github.com/ApeX-Protocol/apexpro-openapi/tree/main/test/demo_stark_key_sign.py)
+Please refer to [demo_stark_key_sign](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_stark_key_sign.py)
 
 ```python
 import time
@@ -189,7 +189,7 @@ print(crossWithdrawRes)
 
 ### WebSocket
 To see comprehensive examples of how to subscribe topics from websockets.
-Please refer to [demo_ws](https://github.com/ApeX-Protocol/apexpro-openapi/tree/main/test/demo_ws.py)
+Please refer to [demo_ws](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_ws.py)
 
 
 ```python
