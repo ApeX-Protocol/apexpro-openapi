@@ -1,6 +1,6 @@
 # ------------ API URLs ------------
 APEX_HTTP_MAIN = 'https://pro.apex.exchange'
-APEX_HTTP_TEST = 'https://qa.pro.apex.exchange'
+APEX_HTTP_TEST = 'https://testnet.pro.apex.exchange'
 APEX_WS_MAIN = 'wss://quote.pro.apex.exchange'
 APEX_WS_TEST = 'wss://quote-qa.pro.apex.exchange'
 

@@ -495,4 +495,30 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def get_order_by_client_id(self, **kwargs):
+        """"
+        get market price from orderbook
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-worst-price
+        :returns: Request results as dictionary.
+        """
 
+        path = URL_SUFFIX + "/v1/order-by-client-id"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def gray_status(self, **kwargs):
+        """"
+        get market price from orderbook
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-worst-price
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/gray-status"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
