@@ -18,6 +18,9 @@ stark_key_pair_with_y_coordinate = client.derive_stark_key(client.default_addres
 
 nonceRes = client.generate_nonce(starkKey=stark_key_pair_with_y_coordinate['public_key'],ethAddress=client.default_address,chainId=NETWORKID_MAIN)
 
+#api_key = client.recover_api_key_credentials(nonce=nonceRes['data']['nonce'], ethereum_address=client.default_address)
+#print(api_key)
+
 regRes = client.register_user(nonce=nonceRes['data']['nonce'],starkKey=stark_key_pair_with_y_coordinate['public_key'],stark_public_key_y_coordinate=stark_key_pair_with_y_coordinate['public_key_y_coordinate'],ethereum_address=client.default_address,
                               eth_mul_address="your mul eth address")
 key = regRes['data']['apiKey']['key']

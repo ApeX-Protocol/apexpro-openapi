@@ -185,6 +185,44 @@ class HttpPrivate(HttpPublic):
             'private_key': private_key_hex
         }
 
+    def recover_api_key_credentials(
+            self,
+            nonce,
+            ethereum_address=None,
+    ):
+        '''
+        Derive API credentials deterministically from an Ethereum key.
+        '''
+        signature = self.signer.sign(
+            ethereum_address or self.default_address,
+            action=OFF_CHAIN_ONBOARDING_ACTION,
+            nonce=nonce,
+        )
+        r_hex = signature[2:66]
+        r_int = int(r_hex, 16)
+        hashed_r_bytes = bytes(Web3.solidityKeccak(['uint256'], [r_int]))
+        secret_bytes = hashed_r_bytes[:30]
+        s_hex = signature[66:130]
+        s_int = int(s_hex, 16)
+        hashed_s_bytes = bytes(Web3.solidityKeccak(['uint256'], [s_int]))
+        key_bytes = hashed_s_bytes[:16]
+        passphrase_bytes = hashed_s_bytes[16:31]
+
+        key_hex = key_bytes.hex()
+        key_uuid = '-'.join([
+            key_hex[:8],
+            key_hex[8:12],
+            key_hex[12:16],
+            key_hex[16:20],
+            key_hex[20:],
+        ])
+
+        return {
+            'secret': base64.urlsafe_b64encode(secret_bytes).decode(),
+            'key': key_uuid,
+            'passphrase': base64.urlsafe_b64encode(passphrase_bytes).decode(),
+        }
+
     def user(self, **kwargs):
         """"
         GET Retrieve User Data.
