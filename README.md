@@ -2,7 +2,7 @@
 
 Official Python3 API connector for Apexpro's HTTP and WebSockets APIs.  
 You can get Api information from 
-[OpenApi-SDK](https://github.com/l2dex/openapi)
+[OpenApi-SDK](https://api-docs.pro.apex.exchange/#introduction)
 
 ## About
 Put simply, `apexpro`  is the official lightweight one-stop-shop module for the Apex pro HTTP and WebSocket APIs. 

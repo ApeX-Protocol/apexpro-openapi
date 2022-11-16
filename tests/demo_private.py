@@ -47,6 +47,9 @@ print(fillsRes)
 deleteOrderRes = client.delete_order(id="123456")
 print(deleteOrderRes)
 
+deleteOrderRes = client.delete_order_by_client_order_id(id="123456")
+print(deleteOrderRes)
+
 openOrdersRes = client.open_orders()
 print(openOrdersRes)
 
@@ -57,6 +60,9 @@ historyOrdersRes = client.history_orders()
 print(historyOrdersRes)
 
 getOrderRes = client.get_order(id="123456")
+print(getOrderRes)
+
+getOrderRes = client.get_order_by_client_order_id(id="123456")
 print(getOrderRes)
 
 fundingRes = client.funding(limit=100,page=0,symbol="BTC-USDC",side="BUY")

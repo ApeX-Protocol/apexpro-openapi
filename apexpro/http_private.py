@@ -314,6 +314,19 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             data=kwargs
         )
+    def delete_order_by_client_order_id(self, **kwargs):
+        """"
+        POST Cancel Order.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-cancel-order
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/delete-client-order-id"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
     def delete_open_orders(self, **kwargs):
         """"
         POST Cancel all Open Orders
@@ -364,6 +377,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/get-order"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def get_order_by_client_order_id(self, **kwargs):
+        """"
+        GET Retrieve Order ID.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-order-id
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/order-by-client-id"
         return self._get(
             endpoint=path,
             params=kwargs
