@@ -82,8 +82,8 @@ class HttpPrivateStark(HttpPrivate):
                 currency = v2
 
         if symbolData is not None :
-            number = float(price)/float(symbolData.get('tickSize'))
-            if number > float(int(number)):
+            number = decimal.Decimal(price) / decimal.Decimal(symbolData.get('tickSize'))
+            if number > int(number):
                 raise Exception(
                     'the price must Multiple of tickSize'
                 )
