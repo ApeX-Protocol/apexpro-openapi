@@ -40,7 +40,8 @@ class HttpPrivateStark(HttpPrivate):
 
        :returns: Request results as dictionary.
        """
-
+        price = str(price)
+        size = str(size)
         clientId = clientId or random_client_id()
         if not self.stark_private_key:
             raise Exception(
