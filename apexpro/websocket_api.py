@@ -41,7 +41,7 @@ class WebSocket(_ApexWebSocketManager):
 
     def depth_stream(self, callback, symbol, limit):
         """
-        https://bybit-exchange.github.io/docs/spot/#t-websockettrade
+        https://api-docs.pro.apex.exchange/#public-websocket-depth
         """
         arg = "orderBook" + str(limit) + ".H." + symbol
         topic = \
@@ -53,7 +53,7 @@ class WebSocket(_ApexWebSocketManager):
         self._ws_public_subscribe(topicStr, arg, callback)
     def ticker_stream(self, callback, symbol):
         """
-        https://bybit-exchange.github.io/docs/spot/#t-websocketrealtimes
+        https://api-docs.pro.apex.exchange/#public-websocket-ticker
         """
         arg = "instrumentInfo" + ".H." + symbol
         topic = \
@@ -66,7 +66,7 @@ class WebSocket(_ApexWebSocketManager):
 
     def klines_stream(self, callback, symbol, interval):
         """
-        https://bybit-exchange.github.io/docs/spot/#t-websocketkline
+        https://api-docs.pro.apex.exchange/#public-websocket-candlestick-chart
         """
         arg = "candle" + "." + str(interval) + "." + symbol
         topic = \
@@ -79,7 +79,7 @@ class WebSocket(_ApexWebSocketManager):
 
     def trade_stream(self, callback, symbol):
         """
-        https://bybit-exchange.github.io/docs/spot/#t-websocketdepth
+       https://api-docs.pro.apex.exchange/#public-websocket-trade
         """
         arg = "recentlyTrade" + ".H." + symbol
         topic = \
@@ -93,7 +93,7 @@ class WebSocket(_ApexWebSocketManager):
 
     def account_info_stream(self, callback):
         """
-        https://bybit-exchange.github.io/docs/spot/#t-outboundaccountinfo
+        https://api-docs.pro.apex.exchange/#private-websocket
         """
         topic = "ws_accounts_v1"
         self._ws_private_subscribe(topic=topic, callback=callback)

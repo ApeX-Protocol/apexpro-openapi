@@ -1,16 +1,16 @@
 # -*- coding: utf-8 -*-
 
 """
-pybit
+apexpro
 ------------------------
 
-pybit is a lightweight and high-performance API connector for the
-RESTful and WebSocket APIs of the Bybit exchange.
+apexpro is a lightweight and high-performance API connector for the
+RESTful and WebSocket APIs of the Apex pro exchange.
 
 Documentation can be found at
-https://github.com/bybit-exchange/pybit
+https://api-docs.pro.apex.exchange/#introduction
 
-:copyright: (c) 2020-2022 bybit-exchange
+:copyright: (c) 2020-2022 apexpro-exchange
 :license: MIT License
 
 """
@@ -181,7 +181,7 @@ class HTTP:
         self.max_retries = max_retries
         self.retry_delay = retry_delay
 
-        # Set whitelist of non-fatal Bybit status codes to retry on.
+        # Set whitelist of non-fatal Apexpro status codes to retry on.
         if retry_codes is None:
             self.retry_codes = {10002, 10006, 30034, 30035, 130035, 130150}
         else:
@@ -210,7 +210,7 @@ class HTTP:
 
     def _auth(self, method, params, recv_window):
         """
-        Generates authentication signature per Bybit API specifications.
+        Generates authentication signature per Apexpro API specifications.
 
         Notes
         -------------------

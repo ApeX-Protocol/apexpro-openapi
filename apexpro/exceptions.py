@@ -21,7 +21,7 @@ class FailedRequestError(Exception):
 
 class InvalidRequestError(Exception):
     """
-    Exception raised for returned Bybit errors.
+    Exception raised for returned Apex pro errors.
 
     Attributes:
         request -- The original request that caused the error.
