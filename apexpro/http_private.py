@@ -269,6 +269,23 @@ class HttpPrivate(HttpPublic):
         )
         self.account = accountRes['data']
         return accountRes
+
+    def get_account(self, **kwargs):
+        """"
+        GET Retrieve User Account Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-account-data
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/account"
+        accountRes =  self._get(
+            endpoint=path,
+            params=kwargs
+        )
+        self.account = accountRes['data']
+        return accountRes
+
     def transfers(self, **kwargs):
         """"
         GET Retrieve User Deposit Data.

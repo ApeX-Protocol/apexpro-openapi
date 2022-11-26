@@ -64,6 +64,19 @@ class WebSocket(_ApexWebSocketManager):
         topicStr = json.dumps(topic, sort_keys=True, separators=(",", ":"))
         self._ws_public_subscribe(topicStr, arg, callback)
 
+    def all_ticker_stream(self, callback):
+        """
+        https://api-docs.pro.apex.exchange/#public-websocket-ticker
+        """
+        arg = "instrumentInfo.all"
+        topic = \
+            {
+                "op": "subscribe",
+                "args": [arg]
+            }
+        topicStr = json.dumps(topic, sort_keys=True, separators=(",", ":"))
+        self._ws_public_subscribe(topicStr, arg, callback)
+
     def klines_stream(self, callback, symbol, interval):
         """
         https://api-docs.pro.apex.exchange/#public-websocket-candlestick-chart
