@@ -11,6 +11,8 @@ key = 'your apiKey-key from register'
 secret = 'your apiKey-secret from register'
 passphrase = 'your apiKey-passphrase from register'
 
+ticker_time = 10
+
 # Connect with authentication!
 ws_client = WebSocket(
     endpoint=APEX_WS_TEST
@@ -21,14 +23,38 @@ client = HttpPrivate(APEX_HTTP_TEST, network_id=NETWORKID_TEST,
 symbol_list = client.configs().get("data").get("perpetualContract")
 print("symbol_list:", symbol_list)
 
-allTickerPrice = []
 
+wallets = {}
+openPositions = {}
+orders = {}
+
+allTickerPrice = []
 
 def all_ticker(message):
     global allTickerPrice
-    #print("all_ticker: ", message)
-    if message.get("data") is not None:
-        allTickerPrice = message.get("data")
+    print("all_ticker: ", message)
+    newAllTickerPrice = message.get("data")
+
+    if len(wallets) == 0:
+        allTickerPrice = newAllTickerPrice
+        handle_account()
+        return
+
+    if newAllTickerPrice is not None:
+        for k, position in enumerate(openPositions):
+            oldPrice = decimal.Decimal(get_symbol_price(position.get('symbol')))
+            symbolData = get_symbol_config(position.get('symbol'))
+            for k, v in enumerate(newAllTickerPrice):
+                if v['s'] == symbolData.get('symbol') or v['s'] == symbolData.get('crossSymbolName') or v['s'] == symbolData.get(
+                'symbolDisplayName'):
+                    if v.get("op") is not None:
+                        newPrice =  decimal.Decimal(v.get("op"))
+                        if oldPrice != newPrice:
+                            print(v['s'] + "  oldPrice: " + str(oldPrice) + "  newPrice: " + str(newPrice))
+                            handle_account()
+                            allTickerPrice = newAllTickerPrice
+                            return
+        allTickerPrice = newAllTickerPrice
 
 
 ws_client.all_ticker_stream(all_ticker)
@@ -81,11 +107,6 @@ def handle_account():
 
     print("totalMaintenanceMarginRequirement is :" + str(totalMaintenanceMarginRequirement))
 
-    timer = Timer(5, handle_account)
-    timer.start()
-    timer.join()
-
-
 
 
 def get_symbol_config(symbol):
@@ -106,4 +127,6 @@ def get_symbol_price(symbol):
 while True:
     # Run your main trading logic here.
     time.sleep(2)
-    handle_account()
+    timer = Timer(ticker_time, handle_account)
+    timer.start()
+    timer.join()
