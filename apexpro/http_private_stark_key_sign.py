@@ -61,7 +61,7 @@ class HttpPrivateStark(HttpPrivate):
                 expirationEpochSeconds or iso_to_epoch_seconds(expiration)
         )
 
-        accountId = accountId or self.account['positionId']
+        accountId = accountId or self.account.get('positionId')
         if not accountId:
             raise Exception(
                 'No accountId provided' +
@@ -75,11 +75,11 @@ class HttpPrivateStark(HttpPrivate):
             )
         symbolData = {}
         currency = {}
-        for k, v in enumerate(self.config['perpetualContract']):
-            if v['symbol'] == symbol:
+        for k, v in enumerate(self.config.get('perpetualContract')):
+            if v.get('symbol') == symbol:
                 symbolData = v
-        for k, v2 in enumerate(self.config['currency']):
-            if v2['id'] == symbolData['settleCurrencyId']:
+        for k, v2 in enumerate(self.config.get('currency')):
+            if v2.get('id') == symbolData.get('settleCurrencyId'):
                 currency = v2
 
         if symbolData is not None :
@@ -98,9 +98,9 @@ class HttpPrivateStark(HttpPrivate):
             human_price=price,
             limit_fee=limitFee,
             expiration_epoch_seconds=expirationEpochSeconds,
-            synthetic_resolution=symbolData['starkExResolution'],
-            synthetic_id=symbolData['starkExSyntheticAssetId'],
-            collateral_id=currency['starkExAssetId'],
+            synthetic_resolution=symbolData.get('starkExResolution'),
+            synthetic_id=symbolData.get('starkExSyntheticAssetId'),
+            collateral_id=currency.get('starkExAssetId'),
         )
         signature = order_to_sign.sign(self.stark_private_key)
 
@@ -119,7 +119,7 @@ class HttpPrivateStark(HttpPrivate):
 
         limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
             decimal.Decimal(fee),
-            decimal.Decimal(currency['stepSize']), )
+            decimal.Decimal(currency.get('stepSize')), )
         expirationEpoch = math.ceil(
             float(expirationEpochSeconds) / ONE_HOUR_IN_SECONDS,
         ) + ORDER_SIGNATURE_EXPIRATION_BUFFER_HOURS
@@ -179,14 +179,14 @@ class HttpPrivateStark(HttpPrivate):
                 expirationEpochSeconds or iso_to_epoch_seconds(expiration)
         )
 
-        ethAddress = ethAddress or self.account['ethereumAddress']
+        ethAddress = ethAddress or self.account.get('ethereumAddress')
         if not ethAddress:
             raise Exception(
                 'No ethAddress provided' +
                 'please call user()'
             )
 
-        accountId = accountId or self.account['positionId']
+        accountId = accountId or self.account.get('positionId')
         if not accountId:
             raise Exception(
                 'No accountId provided' +
@@ -270,14 +270,14 @@ class HttpPrivateStark(HttpPrivate):
                 expirationEpochSeconds or iso_to_epoch_seconds(expiration)
         )
 
-        accountId = accountId or self.account['positionId']
+        accountId = accountId or self.account.get('positionId')
         if not accountId:
             raise Exception(
                 'No accountId provided' +
                 'please call account()'
             )
 
-        ethAddress = ethAddress or self.user['ethereumAddress']
+        ethAddress = ethAddress or self.user.get('ethereumAddress')
         if not ethAddress:
             raise Exception(
                 'No ethAddress provided' +
@@ -291,23 +291,23 @@ class HttpPrivateStark(HttpPrivate):
             )
 
         currency = {}
-        for k, v in enumerate(self.config['currency']):
-            if v['id'] == asset:
+        for k, v in enumerate(self.config.get('currency')):
+            if v.get('id') == asset:
                 currency = v
 
         token = {}
-        for k, v1 in enumerate(self.config['multiChain']['chains']):
-            if v1['chainId'] == self.network_id:
-                for _, v2 in enumerate(v1['tokens']):
-                    if v2['token'] == asset:
+        for k, v1 in enumerate(self.config.get('multiChain').get('chains')):
+            if v1.get('chainId') == self.network_id:
+                for _, v2 in enumerate(v1.get('tokens')):
+                    if v2.get('token') == asset:
                         token = v2
 
         fact = get_transfer_erc20_fact(
             recipient=ethAddress,
-            token_decimals=token['decimals'],
+            token_decimals=token.get('decimals'),
             human_amount=amount,
             token_address=(
-                token['tokenAddress']
+                token.get('tokenAddress')
             ),
             salt=nonce_from_client_id(clientId),
         )
@@ -316,14 +316,14 @@ class HttpPrivateStark(HttpPrivate):
         transfer_to_sign = SignableConditionalTransfer(
             network_id=self.network_id,
             sender_position_id=accountId,
-            receiver_position_id=self.config['global']['fastWithdrawAccountId'],
-            receiver_public_key=self.config['global']['fastWithdrawL2Key'],
-            fact_registry_address=self.config['global']['fastWithdrawFactRegisterAddress'],
+            receiver_position_id=self.config.get('global').get('fastWithdrawAccountId'),
+            receiver_public_key=self.config.get('global').get('fastWithdrawL2Key'),
+            fact_registry_address=self.config.get('global').get('fastWithdrawFactRegisterAddress'),
             fact=fact,
             human_amount=str(totalAmount),
             client_id=clientId,
             expiration_epoch_seconds=expirationEpochSeconds,
-            collateral_id=currency['starkExAssetId']
+            collateral_id=currency.get('starkExAssetId')
         )
 
         signature = transfer_to_sign.sign(self.stark_private_key)
@@ -339,9 +339,9 @@ class HttpPrivateStark(HttpPrivate):
             'ethAddress': ethAddress,
             'clientId': clientId,
             'signature': signature,
-            'erc20Address': token['tokenAddress'],
+            'erc20Address': token.get('tokenAddress'),
             'fee': fee,
-            'lpAccountId': self.config['global']['fastWithdrawAccountId'],
+            'lpAccountId': self.config.get('global').get('fastWithdrawAccountId'),
             'chainId': self.network_id
         }
 
@@ -386,7 +386,7 @@ class HttpPrivateStark(HttpPrivate):
                 expirationEpochSeconds or iso_to_epoch_seconds(expiration)
         )
 
-        accountId = accountId or self.account['positionId']
+        accountId = accountId or self.account.get('positionId')
         if not accountId:
             raise Exception(
                 'No accountId provided' +
@@ -400,27 +400,27 @@ class HttpPrivateStark(HttpPrivate):
             )
 
         currency = {}
-        for k, v in enumerate(self.config['currency']):
-            if v['id'] == asset:
+        for k, v in enumerate(self.config.get('currency')):
+            if v.get('id') == asset:
                 currency = v
 
         token = {}
-        for k, v1 in enumerate(self.config['multiChain']['chains']):
-            if v1['chainId'] == int(chainId):
-                for _, v2 in enumerate(v1['tokens']):
-                    if v2['token'] == asset:
+        for k, v1 in enumerate(self.config.get('multiChain').get('chains')):
+            if v1.get('chainId') == int(chainId):
+                for _, v2 in enumerate(v1.get('tokens')):
+                    if v2.get('token') == asset:
                         token = v2
 
         totalAmount = decimal.Decimal(amount) + decimal.Decimal(fee)
         transfer_to_sign = SignableTransfer(
             network_id=chainId,
             sender_position_id=accountId,
-            receiver_position_id=self.config['global']['crossChainAccountId'],
-            receiver_public_key=self.config['global']['crossChainL2Key'],
+            receiver_position_id=self.config.get('global').get('crossChainAccountId'),
+            receiver_public_key=self.config.get('global').get('crossChainL2Key'),
             human_amount=str(totalAmount),
             client_id=clientId,
             expiration_epoch_seconds=expirationEpochSeconds,
-            collateral_id=currency['starkExAssetId']
+            collateral_id=currency.get('starkExAssetId')
         )
         signature = transfer_to_sign.sign(self.stark_private_key)
 
@@ -434,9 +434,9 @@ class HttpPrivateStark(HttpPrivate):
             'expiration': expirationEpoch * 3600 * 1000,
             'clientId': clientId,
             'signature': signature,
-            'erc20Address': token['tokenAddress'],
+            'erc20Address': token.get('tokenAddress'),
             'fee': fee,
-            'lpAccountId': self.config['global']['crossChainAccountId'],
+            'lpAccountId': self.config.get('global').get('crossChainAccountId'),
             'chainId': chainId
         }
         path = URL_SUFFIX + "/v1/cross-chain-withdraw"

@@ -33,9 +33,9 @@ class HttpPrivate(HttpPublic):
             )
             headers = {
                 'APEX-SIGNATURE': signature,
-                'APEX-API-KEY': self.api_key_credentials['key'],
+                'APEX-API-KEY': self.api_key_credentials.get('key'),
                 'APEX-TIMESTAMP': str(now_iso),
-                'APEX-PASSPHRASE': self.api_key_credentials['passphrase'],
+                'APEX-PASSPHRASE': self.api_key_credentials.get('passphrase'),
             }
         return self._submit_request(
             method=method,
@@ -80,7 +80,7 @@ class HttpPrivate(HttpPublic):
 
         hashed = hmac.new(
             base64.standard_b64encode(
-                (self.api_key_credentials['secret']).encode(encoding='utf-8'),
+                (self.api_key_credentials.get('secret')).encode(encoding='utf-8'),
             ),
             msg=message_string.encode(encoding='utf-8'),
             digestmod=hashlib.sha256,
@@ -160,8 +160,8 @@ class HttpPrivate(HttpPublic):
             }
         )
         if onboardingRes.get('data') is not None:
-            self.user = onboardingRes['data']['user']
-            self.account = onboardingRes['data']['account']
+            self.user = onboardingRes.get('data').get('user')
+            self.account = onboardingRes.get('data').get('account')
         return onboardingRes
 
     def derive_stark_key(
@@ -236,7 +236,7 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
-        self.user = userRes['data']
+        self.user = userRes.get('data')
         return userRes
 
     def modify_user(self, **kwargs):
@@ -267,7 +267,7 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
-        self.account = accountRes['data']
+        self.account = accountRes.get('data')
         return accountRes
 
     def get_account(self, **kwargs):
@@ -283,7 +283,7 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
-        self.account = accountRes['data']
+        self.account = accountRes.get('data')
         return accountRes
 
     def transfers(self, **kwargs):
