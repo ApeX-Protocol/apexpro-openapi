@@ -65,7 +65,7 @@ class HttpPrivateStark(HttpPrivate):
         if not accountId:
             raise Exception(
                 'No accountId provided' +
-                'please call account()'
+                'please call get_account()'
             )
 
         if not self.config:
@@ -183,14 +183,14 @@ class HttpPrivateStark(HttpPrivate):
         if not ethAddress:
             raise Exception(
                 'No ethAddress provided' +
-                'please call user()'
+                'please call get_user()'
             )
 
         accountId = accountId or self.account.get('positionId')
         if not accountId:
             raise Exception(
                 'No accountId provided' +
-                'please call account()'
+                'please call get_account()'
             )
 
         if not self.config:
@@ -274,14 +274,14 @@ class HttpPrivateStark(HttpPrivate):
         if not accountId:
             raise Exception(
                 'No accountId provided' +
-                'please call account()'
+                'please call get_account()'
             )
 
         ethAddress = ethAddress or self.user.get('ethereumAddress')
         if not ethAddress:
             raise Exception(
                 'No ethAddress provided' +
-                'please call user()'
+                'please call get_user()'
             )
 
         if not self.config:
@@ -390,7 +390,7 @@ class HttpPrivateStark(HttpPrivate):
         if not accountId:
             raise Exception(
                 'No accountId provided' +
-                'please call account()'
+                'please call gett_account()'
             )
 
         if not self.config:

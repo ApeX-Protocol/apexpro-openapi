@@ -8,7 +8,7 @@ root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST
+from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
 
 print("Hello, Apexpro")
 
@@ -24,19 +24,20 @@ public_key_y_coordinate = 'your stark_public_key_y_coordinate from register'
 private_key = 'your stark_private_key from register'
 
 
-client = HttpPrivateStark(APEX_HTTP_TEST, network_id=NETWORKID_TEST,
-                     stark_public_key=public_key,
-                     stark_private_key=private_key,
-                     stark_public_key_y_coordinate=public_key_y_coordinate,
-                     api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
+
+client = HttpPrivateStark(APEX_HTTP_MAIN, network_id=NETWORKID_MAIN,
+                          stark_public_key=public_key,
+                          stark_private_key=private_key,
+                          stark_public_key_y_coordinate=public_key_y_coordinate,
+                          api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
 configs = client.configs()
-#client.user()
-client.account()
+#client.get_user()
+print(client.get_account())
 
 currentTime = time.time()
 
 limitFee = client.account['takerFeeRate']
-createOrderRes = client.create_order(symbol="LINK-USDC", side="BUY",
+createOrderRes = client.create_order(symbol="ATOM-USDC", side="BUY",
                                            type="LIMIT", size="1",
                                            price="9.1", limitFee=limitFee,
                                      accountId=client.account['positionId'],

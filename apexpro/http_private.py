@@ -239,6 +239,22 @@ class HttpPrivate(HttpPublic):
         self.user = userRes.get('data')
         return userRes
 
+    def get_user(self, **kwargs):
+        """"
+        GET Retrieve User Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-data
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/user"
+        userRes = self._get(
+            endpoint=path,
+            params=kwargs
+        )
+        self.user = userRes.get('data')
+        return userRes
+
     def modify_user(self, **kwargs):
         """"
         POST Edit User Data.

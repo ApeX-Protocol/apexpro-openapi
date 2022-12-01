@@ -20,13 +20,13 @@ passphrase = 'your apiKey-passphrase from register'
 client = HttpPrivate(APEX_HTTP_TEST, network_id=NETWORKID_TEST, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
 configs = client.configs()
 
-userRes = client.user()
+userRes = client.get_user()
 print(userRes)
 
 modifyUserRes = client.modify_user(username="pythonTest",email="11@aa.com",emailNotifyGeneralEnable="false")
 print(modifyUserRes)
 
-accountRes = client.account()
+accountRes = client.get_account()
 print(accountRes)
 
 transfersRes = client.transfers(limit=100,page=0,currencyId="USDC",chainIds="1,5,13")
