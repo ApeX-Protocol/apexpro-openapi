@@ -133,7 +133,6 @@ class HttpPrivate(HttpPublic):
             )
 
         eth_address = ethereum_address or self.default_address
-#0x6f4ae7978b936f91360d70eed28b54280a75cf54a44d029ddd604d1260bd82906a5b0f705785c7394776026fd2bd74b8c956cc7648982f0aea1bb86ed11c8d6b1c00
         signature = self.signer.sign(
             eth_address,
             action=OFF_CHAIN_ONBOARDING_ACTION,

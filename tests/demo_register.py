@@ -11,12 +11,12 @@ from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NE
 print("Hello, Apexpro")
 priKey = "your eth private key"
 
-client = HttpPrivate(APEX_HTTP_TEST, network_id=NETWORKID_TEST, eth_private_key=priKey)
+client = HttpPrivate(APEX_HTTP_MAIN, network_id=NETWORKID_MAIN, eth_private_key=priKey)
 configs = client.configs()
 
 stark_key_pair_with_y_coordinate = client.derive_stark_key(client.default_address)
 
-nonceRes = client.generate_nonce(starkKey=stark_key_pair_with_y_coordinate['public_key'],ethAddress=client.default_address,chainId=NETWORKID_TEST)
+nonceRes = client.generate_nonce(starkKey=stark_key_pair_with_y_coordinate['public_key'],ethAddress=client.default_address,chainId=NETWORKID_MAIN)
 
 #api_key = client.recover_api_key_credentials(nonce=nonceRes['data']['nonce'], ethereum_address=client.default_address)
 #print(api_key)

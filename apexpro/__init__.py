@@ -30,6 +30,7 @@ from apexpro.starkex.helpers import private_key_to_public_key_pair_hex
 from datetime import datetime as dt
 from concurrent.futures import ThreadPoolExecutor
 
+from .eth import Eth
 from .exceptions import FailedRequestError, InvalidRequestError
 from .models import configDecoder
 
@@ -123,6 +124,7 @@ class HTTP:
         self.stark_public_key_y_coordinate = stark_public_key_y_coordinate
 
         self.web3 = None
+        self._eth = None
         self.eth_signer = None
         self.default_address = None
         self.network_id = None
@@ -246,6 +248,50 @@ class HTTP:
             bytes(api_secret, 'utf-8'),
             bytes(_val, 'utf-8'), digestmod='sha256'
         ).hexdigest())
+
+    @property
+    def eth(self):
+        '''
+        Get the eth module, used for interacting with Ethereum smart contracts.
+        '''
+        collateral_asset_id = ''
+        token_contracts = ''
+        web3_provider = ''
+        starware_perpetuals_contract = self.config.get('global').get('starkExContractAddress')
+        for k, v1 in enumerate(self.config.get('currency')):
+            if v1.get('id') == 'USDC':
+                collateral_asset_id = v1.get('starkExAssetId')
+        for k, v2 in enumerate(self.config.get('multiChain').get('chains')):
+            if v2.get('chainId') == self.network_id:
+                web3_provider = v2.get('rpcUrl')
+                for k, v3 in enumerate(v2.get('tokens')):
+                    if v3.get('token') == 'USDC':
+                        token_contracts = v3.get('tokenAddress')
+
+        web3_provider = Web3.HTTPProvider(web3_provider)
+        self.web3 =  Web3(web3_provider)
+
+        if not self._eth:
+            eth_private_key = getattr(self.eth_signer, '_private_key', None)
+            if self.web3 and eth_private_key:
+                self._eth = Eth(
+                    web3=self.web3,
+                    network_id=self.network_id,
+                    eth_private_key=eth_private_key,
+                    default_address=self.default_address,
+                    stark_public_key=self.stark_public_key,
+                    send_options=self.eth_send_options,
+                    collateral_asset_id = collateral_asset_id,
+                    starware_perpetuals_contract = starware_perpetuals_contract,
+                    token_contracts = token_contracts,
+                )
+            else:
+                raise Exception(
+                    'Eth module is not supported since neither web3 ' +
+                    'nor web3_provider was provided OR since neither ' +
+                    'eth_private_key nor web3_account was provided',
+                    )
+        return self._eth
 
     def _verify_string(self, params, key):
         if key in params:
