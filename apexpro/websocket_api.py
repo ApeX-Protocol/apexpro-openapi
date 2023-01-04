@@ -51,6 +51,28 @@ class WebSocket(_ApexWebSocketManager):
             }
         topicStr = json.dumps(topic, sort_keys=True, separators=(",", ":"))
         self._ws_public_subscribe(topicStr, arg, callback)
+    def unsub_depth_topic_stream(self, callback, arg):
+        """
+        https://api-docs.pro.apex.exchange/#public-websocket-depth
+        """
+        topic = \
+            {
+                "op": "unsubscribe",
+                "args": [arg]
+            }
+        topicStr = json.dumps(topic, sort_keys=True, separators=(",", ":"))
+        self._ws_public_subscribe(topicStr, arg, callback)
+    def depth_topic_stream(self, callback, arg):
+        """
+        https://api-docs.pro.apex.exchange/#public-websocket-depth
+        """
+        topic = \
+            {
+                "op": "subscribe",
+                "args": [arg]
+            }
+        topicStr = json.dumps(topic, sort_keys=True, separators=(",", ":"))
+        self._ws_public_subscribe(topicStr, arg, callback)
     def ticker_stream(self, callback, symbol):
         """
         https://api-docs.pro.apex.exchange/#public-websocket-ticker

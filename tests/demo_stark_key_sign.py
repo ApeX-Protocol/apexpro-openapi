@@ -62,7 +62,7 @@ print(createOrderRes)
 #fastWithdrawRes = client.fast_withdrawal(amount='1002',expirationEpochSeconds= currentTime,asset='USDC',fee=feeRes['data']['fee'])
 #print(fastWithdrawRes)
 
-deleteOrderRes = client.delete_open_orders(symbol="LINK-USDC")
+deleteOrderRes = client.delete_open_orders(symbol="BTC-USDC")
 print(deleteOrderRes)
 
 deleteOrderRes = client.delete_open_orders()

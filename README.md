@@ -148,9 +148,9 @@ client.get_account()
 currentTime = time.time()
 
 limitFee = client.account['takerFeeRate']
-createOrderRes = client.create_order(symbol="LINK-USDC", side="BUY",
-type="LIMIT", size="1",
-price="9.1", limitFee=limitFee,
+createOrderRes = client.create_order(symbol="BTC-USDC", side="BUY",
+type="LIMIT", size="0.01",
+price="1991", limitFee=limitFee,
 accountId=client.account['positionId'],
 expirationEpochSeconds= currentTime)
 print(createOrderRes)
@@ -173,7 +173,7 @@ print(createOrderRes)
 #fastWithdrawRes = client.fast_withdrawal(amount='1002',expirationEpochSeconds= currentTime,asset='USDC',fee=feeRes['data']['fee'])
 #print(fastWithdrawRes)
 
-deleteOrderRes = client.delete_open_orders(symbol="LINK-USDC")
+deleteOrderRes = client.delete_open_orders(symbol="BTC-USDC")
 print(deleteOrderRes)
 
 deleteOrderRes = client.delete_open_orders()
