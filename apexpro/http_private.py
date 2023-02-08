@@ -624,7 +624,7 @@ class HttpPrivate(HttpPublic):
         """"
         get market price from orderbook
         :param kwargs: See
-        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-worst-price
+        https://api-docs.pro.apex.exchange/#privateapi-post-sets-the-initial-margin-rate-of-a-contract
         :returns: Request results as dictionary.
         """
 
