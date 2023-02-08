@@ -29,6 +29,7 @@ print(modifyUserRes)
 accountRes = client.get_account()
 print(accountRes)
 
+
 transfersRes = client.transfers(limit=100,page=0,currencyId="USDC",chainIds="1,5,13")
 print(transfersRes)
 
@@ -85,6 +86,10 @@ print(historyValueRes)
 
 markAllNotifyReadRes = client.mark_all_notify_read()
 print(markAllNotifyReadRes)
+
+setInitialMarginRateRes = client.set_initial_margin_rate(symbol="BTC-USDC",initialMarginRate="0.1")
+print(setInitialMarginRateRes)
+
 
 print("end, Apexpro")
 

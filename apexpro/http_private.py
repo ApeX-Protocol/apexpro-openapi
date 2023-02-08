@@ -619,3 +619,17 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
+
+    def set_initial_margin_rate(self, **kwargs):
+        """"
+        get market price from orderbook
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-worst-price
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/set-initial-margin-rate"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
