@@ -87,7 +87,9 @@ class HttpPrivate(HttpPublic):
         )
         return base64.standard_b64encode(hashed.digest()).decode()
 
-    def generate_nonce(self, **kwargs):
+    def generate_nonce(self, starkKey, ethAddress, chainId,
+                       refresh="true"
+                       ):
         """"
         POST: Generate nonce.
         :param kwargs: See
@@ -99,7 +101,13 @@ class HttpPrivate(HttpPublic):
         return self._private_request(
             method="POST",
             path=path,
-            data=kwargs
+            data={
+                'starkKey': starkKey,
+                'ethAddress': ethAddress,
+                'chainId': chainId,
+                'category': 'CATEGORY_API',
+                'refresh': refresh,
+            }
         )
 
     def register_user(
