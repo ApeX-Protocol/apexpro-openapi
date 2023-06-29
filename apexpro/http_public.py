@@ -89,8 +89,8 @@ class HttpPublic(HTTP):
         :returns: Request results as dictionary.
         """
         suffix = URL_SUFFIX + "/v1/history-funding"
-        if kwargs['symbol'] is not None:
-            kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        #if kwargs['symbol'] is not None:
+        #    kwargs['symbol'] = kwargs['symbol'].replace('-', '')
         return self._submit_request(
             method='GET',
             path=self.endpoint + suffix,

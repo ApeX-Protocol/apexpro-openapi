@@ -614,6 +614,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def get_account_balance(self, **kwargs):
+        """"
+        get market price from orderbook
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/?lang=zh-TW#privateapi-get-retrieve-user-account-balance
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v1/account-balance"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def gray_status(self, **kwargs):
         """"
         get market price from orderbook

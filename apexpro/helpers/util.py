@@ -1,3 +1,4 @@
+import decimal
 import time
 
 
@@ -19,3 +20,8 @@ def wait_for_condition(fn, expected_value, timeout_s, interval_s=1):
             raise TimedOutWaitingForCondition(result, expected_value)
         result = fn()
     return result
+
+def round_size(size, ticker_size):
+    sizeNumber = decimal.Decimal(size) / decimal.Decimal(ticker_size)
+    return decimal.Decimal(int(sizeNumber)) * decimal.Decimal(ticker_size)
+
