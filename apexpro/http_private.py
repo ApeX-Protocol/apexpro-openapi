@@ -88,7 +88,7 @@ class HttpPrivate(HttpPublic):
         return base64.standard_b64encode(hashed.digest()).decode()
 
     def generate_nonce(self, starkKey, ethAddress, chainId,
-                       refresh="true"
+                       refresh="false"
                        ):
         """"
         POST: Generate nonce.

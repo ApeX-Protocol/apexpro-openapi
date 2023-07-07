@@ -277,7 +277,7 @@ class HttpPrivateStark(HttpPrivate):
                 'please call get_account()'
             )
 
-        ethAddress = ethAddress or self.user.get('ethereumAddress')
+        ethAddress = ethAddress or self.user.get('ethereumAddress') or self.account.get('ethereumAddress')
         if not ethAddress:
             raise Exception(
                 'No ethAddress provided' +
