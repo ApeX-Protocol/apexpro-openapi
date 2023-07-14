@@ -2,6 +2,7 @@ import os
 import sys
 import time
 
+from apexpro.helpers.util import round_size
 from apexpro.http_private_stark_key_sign import HttpPrivateStark
 
 root_path = os.path.abspath(__file__)
@@ -11,6 +12,7 @@ sys.path.append(root_path)
 from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
 
 print("Hello, Apexpro")
+
 
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
 # need starkey for withdraw and createOrder
@@ -24,26 +26,29 @@ public_key_y_coordinate = 'your stark_public_key_y_coordinate from register'
 private_key = 'your stark_private_key from register'
 
 
-
 client = HttpPrivateStark(APEX_HTTP_MAIN, network_id=NETWORKID_MAIN,
                           stark_public_key=public_key,
                           stark_private_key=private_key,
                           stark_public_key_y_coordinate=public_key_y_coordinate,
                           api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
 configs = client.configs()
-#client.get_user()
+
+
+client.get_user()
 print(client.get_account())
 
 currentTime = time.time()
 
 limitFee = client.account['takerFeeRate']
-createOrderRes = client.create_order(symbol="ATOM-USDC", side="BUY",
-                                           type="LIMIT", size="1",
-                                           price="9.1", limitFee=limitFee,
-                                     accountId=client.account['positionId'],
-                                    expirationEpochSeconds= currentTime)
+createOrderRes = client.create_order(symbol="ETH-USDC", side="SELL",
+                                           type="LIMIT", size="0.01",expirationEpochSeconds= currentTime,
+                                           price="1890.5", limitFee=limitFee)
 print(createOrderRes)
 
+createOrderRes = client.create_order(symbol="ETH-USDC", side="BUY",
+                                     type="TAKE_PROFIT_LIMIT", size="0.01",expirationEpochSeconds= currentTime,
+                                     price="1911.5", limitFee=limitFee, triggerPriceType="INDEX", triggerPrice="1911")
+print(createOrderRes)
 
 
 worstPrice = client.get_worst_price(symbol="BTC-USDC", side="SELL", size="0.1")
