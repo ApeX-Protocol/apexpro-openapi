@@ -1,3 +1,4 @@
+import decimal
 import os
 import sys
 import time
@@ -26,37 +27,70 @@ public_key_y_coordinate = 'your stark_public_key_y_coordinate from register'
 private_key = 'your stark_private_key from register'
 
 
-client = HttpPrivateStark(APEX_HTTP_MAIN, network_id=NETWORKID_MAIN,
+client = HttpPrivateStark(APEX_HTTP_TEST, network_id=NETWORKID_TEST,
                           stark_public_key=public_key,
                           stark_private_key=private_key,
                           stark_public_key_y_coordinate=public_key_y_coordinate,
                           api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
 configs = client.configs()
-
-
 client.get_user()
 print(client.get_account())
 
-currentTime = time.time()
+# sample1
+# When create an order, optimize the size of the order according to the stepSize of the currency symbol,
+# and optimize the price of the order according to the tickSize
+symbolData = {}
+for k, v in enumerate(configs.get('data').get('perpetualContract')):
+    if v.get('symbol') == "BTC-USDC":
+        symbolData = v
 
-limitFee = client.account['takerFeeRate']
-createOrderRes = client.create_order(symbol="ETH-USDC", side="SELL",
-                                           type="LIMIT", size="0.01",expirationEpochSeconds= currentTime,
-                                           price="1890.5", limitFee=limitFee)
+print(round_size("0.0116", symbolData.get('stepSize')))
+print(round_size("25555.8", symbolData.get('tickSize')))
+
+# sample2
+# Create a limit order
+currentTime = time.time()
+limitFeeRate = client.account['takerFeeRate']
+
+size = round_size("0.01", symbolData.get('stepSize'))
+price = round_size("28888.5", symbolData.get('tickSize'))
+createOrderRes = client.create_order(symbol="BTC-USDC", side="BUY",
+                                           type="LIMIT", size=size, expirationEpochSeconds= currentTime,
+                                           price=price, limitFeeRate=limitFeeRate)
 print(createOrderRes)
+
+# sample3
+# Create a conditional order
 
 createOrderRes = client.create_order(symbol="ETH-USDC", side="BUY",
-                                     type="TAKE_PROFIT_LIMIT", size="0.01",expirationEpochSeconds= currentTime,
-                                     price="1911.5", limitFee=limitFee, triggerPriceType="INDEX", triggerPrice="1911")
+                                     type="STOP_LIMIT", size="0.01",expirationEpochSeconds= currentTime,
+                                     price="1811.5", limitFeeRate=limitFeeRate, triggerPriceType="INDEX", triggerPrice="1811")
 print(createOrderRes)
 
+# sample4
+# Create a market order
+# first, get a worstPrice from server.( market order price must not none)
 
 worstPrice = client.get_worst_price(symbol="BTC-USDC", side="SELL", size="0.1")
 price = worstPrice['data']['worstPrice']
-##market order price must not none
+
 createOrderRes = client.create_order(symbol="BTC-USDC", side="SELL",
-                                     type="MARKET", size="1", price=price, limitFee=limitFee,
+                                     type="MARKET", size="1", price=price, limitFeeRate=limitFeeRate,
                                      expirationEpochSeconds= currentTime )
+print(createOrderRes)
+
+# sample5
+# Create a TP/SL order
+# first, Set a slippage to get an acceptable price
+# if timeInForce="GOOD_TIL_CANCEL" or "POST_ONLY", slippage is recommended to be greater than 0.1
+# if timeInForce="FILL_OR_KILL" or "IMMEDIATE_OR_CANCEL", slippage is recommended to be greater than 0.2
+
+slippage = decimal.Decimal("0.1")
+price =  round_size(decimal.Decimal("28888") * (decimal.Decimal("1") + slippage), symbolData.get('tickSize'))
+
+createOrderRes = client.create_order(symbol="BTC-USDC", side="BUY", isPositionTpsl = True, reduceOnly= True,
+                                     type="TAKE_PROFIT_MARKET", size="0.1", price=price, limitFeeRate=limitFeeRate,
+                                     expirationEpochSeconds= currentTime, triggerPriceType="INDEX", triggerPrice="28888" )
 print(createOrderRes)
 
 #createWithdrawRes = client.create_withdrawal(amount='1001',expirationEpochSeconds= currentTime,asset='USDC')

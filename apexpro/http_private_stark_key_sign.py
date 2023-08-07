@@ -19,7 +19,8 @@ class HttpPrivateStark(HttpPrivate):
                      side,
                      type,
                      size,
-                     limitFee,
+                     limitFeeRate=None,
+                     limitFee=None,
                      price=None,
                      accountId=None,
                      timeInForce="GOOD_TIL_CANCEL",
@@ -30,12 +31,13 @@ class HttpPrivateStark(HttpPrivate):
                      clientId=None,
                      expiration=None,
                      expirationEpochSeconds=None,
+                     isPositionTpsl = False,
                      signature=None, ):
         """"
         POST  create_order.
         client.create_order(symbol="BTC-USDC", side="SELL",
                                            type="LIMIT", size="0.01",
-                                           price="20000", limitFee="1",
+                                           price="20000", limitFeeRate="1",
                                             accountId="325881046451093849",reduceOnly=False,
                                            expiration=now_iso + SEVEN_DAYS_S + 60*1000, timeInForce="GOOD_TIL_CANCEL")
 
@@ -61,7 +63,7 @@ class HttpPrivateStark(HttpPrivate):
         expirationEpochSeconds = (
                 expirationEpochSeconds or iso_to_epoch_seconds(expiration)
         )
-
+        limitFeeRate = limitFeeRate or limitFee
         accountId = accountId or self.account.get('positionId')
         if not accountId:
             raise Exception(
@@ -97,7 +99,7 @@ class HttpPrivateStark(HttpPrivate):
             side=side,
             human_size=size,
             human_price=price,
-            limit_fee=limitFee,
+            limit_fee=limitFeeRate,
             expiration_epoch_seconds=expirationEpochSeconds,
             synthetic_resolution=symbolData.get('starkExResolution'),
             synthetic_id=symbolData.get('starkExSyntheticAssetId'),
@@ -110,13 +112,13 @@ class HttpPrivateStark(HttpPrivate):
                 decimal.Decimal(size),
                 decimal.Decimal(price)
             )
-            fee = DECIMAL_CONTEXT_ROUND_UP.multiply(human_cost, decimal.Decimal(limitFee))
+            fee = DECIMAL_CONTEXT_ROUND_UP.multiply(human_cost, decimal.Decimal(limitFeeRate))
         else:
             human_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
                 decimal.Decimal(size),
                 decimal.Decimal(price)
             )
-            fee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(human_cost, decimal.Decimal(limitFee))
+            fee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(human_cost, decimal.Decimal(limitFeeRate))
 
         limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
             decimal.Decimal(fee),
@@ -140,6 +142,7 @@ class HttpPrivateStark(HttpPrivate):
             'clientId': clientId,
             'signature': signature,
             'reduceOnly': reduceOnly,
+            'isPositionTpsl': isPositionTpsl,
         }
 
         path = URL_SUFFIX + "/v1/create-order"

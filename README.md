@@ -147,10 +147,10 @@ client.get_account()
 
 currentTime = time.time()
 
-limitFee = client.account['takerFeeRate']
+limitFeeRate = client.account['takerFeeRate']
 createOrderRes = client.create_order(symbol="BTC-USDC", side="BUY",
 type="LIMIT", size="0.01",
-price="1991", limitFee=limitFee,
+price="1991", limitFeeRate=limitFeeRate,
 accountId=client.account['positionId'],
 expirationEpochSeconds= currentTime)
 print(createOrderRes)
