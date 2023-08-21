@@ -84,6 +84,7 @@ print(createOrderRes)
 # first, Set a slippage to get an acceptable price
 # if timeInForce="GOOD_TIL_CANCEL" or "POST_ONLY", slippage is recommended to be greater than 0.1
 # if timeInForce="FILL_OR_KILL" or "IMMEDIATE_OR_CANCEL", slippage is recommended to be greater than 0.2
+# when buying, the price = price*(1 + slippage). when selling, the price = price*(1 - slippage)
 
 slippage = decimal.Decimal("0.1")
 price =  round_size(decimal.Decimal("28888") * (decimal.Decimal("1") + slippage), symbolData.get('tickSize'))
