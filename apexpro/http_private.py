@@ -171,6 +171,69 @@ class HttpPrivate(HttpPublic):
             self.account = onboardingRes.get('data').get('account')
         return onboardingRes
 
+    def register_user_v2(
+            self,
+            nonce,
+            starkKey=None,
+            stark_public_key_y_coordinate=None,
+            ethereum_address=None,
+            referred_by_affiliate_link=None,
+            country=None,
+            isLpAccount=None,
+            eth_mul_address=None,
+            market=None,
+    ):
+        """"
+        POST Registration & Onboarding.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-registration-amp-onboarding
+        :returns: Request results as dictionary.
+        """
+        stark_key = starkKey or self.stark_public_key
+        stark_key_y = (
+                stark_public_key_y_coordinate or self.stark_public_key_y_coordinate
+        )
+        if stark_key is None:
+            raise ValueError(
+                'STARK private key or public key is required'
+            )
+        if stark_key_y is None:
+            raise ValueError(
+                'STARK private key or public key y-coordinate is required'
+            )
+
+        eth_address = ethereum_address or self.default_address
+        signature = self.signer.sign(
+            eth_address,
+            action=OFF_CHAIN_ONBOARDING_ACTION,
+            nonce=nonce,
+        )
+
+        path = URL_SUFFIX + "/v2/onboarding"
+        onboardingRes = self._private_request(
+            method="POST",
+            path=path,
+            data= {
+                'starkKey': stark_key,
+                'starkKeyYCoordinate': stark_key_y,
+                'referredByAffiliateLink': referred_by_affiliate_link,
+                'ethereumAddress': eth_address,
+                'country': country,
+                'category': 'CATEGORY_API',
+                'isLpAccount': isLpAccount,
+                'ethMulAddress': eth_mul_address,
+                'market':market,
+            },
+            headers={
+                'APEX-SIGNATURE': signature,
+                'APEX-ETHEREUM-ADDRESS': eth_address,
+            }
+        )
+        if onboardingRes.get('data') is not None:
+            self.user = onboardingRes.get('data').get('user')
+            self.account = onboardingRes.get('data').get('account')
+        return onboardingRes
+
     def derive_stark_key(
             self,
             ethereum_address=None,
@@ -302,6 +365,22 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/account"
+        accountRes =  self._get(
+            endpoint=path,
+            params=kwargs
+        )
+        self.account = accountRes.get('data')
+        return accountRes
+
+    def get_account_v2(self, **kwargs):
+        """"
+        GET Retrieve User Account Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-account-data
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/account"
         accountRes =  self._get(
             endpoint=path,
             params=kwargs
