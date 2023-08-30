@@ -181,7 +181,7 @@ class HttpPrivate(HttpPublic):
             country=None,
             isLpAccount=None,
             eth_mul_address=None,
-            market=None,
+            token=None,
     ):
         """"
         POST Registration & Onboarding.
@@ -222,7 +222,7 @@ class HttpPrivate(HttpPublic):
                 'category': 'CATEGORY_API',
                 'isLpAccount': isLpAccount,
                 'ethMulAddress': eth_mul_address,
-                'market':market,
+                'token':token,
             },
             headers={
                 'APEX-SIGNATURE': signature,
