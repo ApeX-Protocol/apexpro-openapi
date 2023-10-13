@@ -312,6 +312,19 @@ class HTTP:
         self.starkeySigner = SignOnboardingAction(self.eth_signer, self.env_id)
         return configs
 
+    def configs_v2(self, **kwargs):
+        suffix = URL_SUFFIX + "/v2/symbols"
+        configs = self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix
+        )
+        self.configV2 = configs['data']
+        self.env_id = configs['data']['usdcConfig']['global']['registerEnvId']
+        self.usdcConfigV2 = configs['data']['usdcConfig']
+        self.usdtConfigV2 = configs['data']['usdtConfig']
+        self.starkeySigner = SignOnboardingAction(self.eth_signer, self.env_id)
+        return configs
+
     def _submit_request(self, method=None, path=None, query=None, headers=None):
         """
         Submits the request to the API.

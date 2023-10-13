@@ -153,6 +153,7 @@ class _WebSocketManager:
             iso_timestamp=str(time_stamp),
         )
 
+
         req = {
             'type': 'login',
             'topics': ['ws_notify_v1', 'ws_accounts_v1'],
@@ -326,3 +327,12 @@ def _make_public_kwargs(private_kwargs):
     public_kwargs = copy.deepcopy(private_kwargs)
     public_kwargs.pop("api_key_credentials", "")
     return public_kwargs
+
+
+
+
+
+
+
+
+

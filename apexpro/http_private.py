@@ -120,6 +120,7 @@ class HttpPrivate(HttpPublic):
             country=None,
             isLpAccount=None,
             eth_mul_address=None,
+            sourceFlag=None,
     ):
         """"
         POST Registration & Onboarding.
@@ -160,6 +161,7 @@ class HttpPrivate(HttpPublic):
                 'category': 'CATEGORY_API',
                 'isLpAccount': isLpAccount,
                 'ethMulAddress': eth_mul_address,
+                'sourceFlag': sourceFlag,
             },
             headers={
                 'APEX-SIGNATURE': signature,
@@ -182,6 +184,7 @@ class HttpPrivate(HttpPublic):
             isLpAccount=None,
             eth_mul_address=None,
             token=None,
+            sourceFlag=None,
     ):
         """"
         POST Registration & Onboarding.
@@ -223,6 +226,7 @@ class HttpPrivate(HttpPublic):
                 'isLpAccount': isLpAccount,
                 'ethMulAddress': eth_mul_address,
                 'token':token,
+                'sourceFlag': sourceFlag,
             },
             headers={
                 'APEX-SIGNATURE': signature,
@@ -402,6 +406,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def transfers_v2(self, **kwargs):
+        """"
+        GET Retrieve User Deposit Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-deposit-data
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/transfers"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def withdraw_list(self, **kwargs):
         """"
         GET Retrieve User Withdrawal List.
@@ -415,7 +433,19 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
+    def withdraw_list_v2(self, **kwargs):
+        """"
+        GET Retrieve User Withdrawal List.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-withdrawal-list
+        :returns: Request results as dictionary.
+        """
 
+        path = URL_SUFFIX + "/v2/withdraw-list"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
     def uncommon_withdraw_fee(self, **kwargs):
         """"
         GET Fast & Cross-Chain Withdrawal Fees.
@@ -425,6 +455,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/uncommon-withdraw-fee"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def uncommon_withdraw_fee_v2(self, **kwargs):
+        """"
+        GET Fast & Cross-Chain Withdrawal Fees.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-fast-amp-cross-chain-withdrawal-fees
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/uncommon-withdraw-fee"
         return self._get(
             endpoint=path,
             params=kwargs
@@ -444,6 +488,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def transfer_limit_v2(self, **kwargs):
+        """"
+        GET Retrieve Withdrawal & Transfer Limits.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-withdrawal-amp-transfer-limits
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/transfer-limit"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def fills(self, **kwargs):
         """"
         GET Retrieve Trade History.
@@ -453,6 +511,28 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/fills"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def fills_v2(self, **kwargs):
+        """"
+        GET Retrieve Trade History.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-trade-history
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/fills"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def order_fills_v2(self, **kwargs):
+
+        path = URL_SUFFIX + "/v2/order-fills"
         return self._get(
             endpoint=path,
             params=kwargs
@@ -471,6 +551,22 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             data=kwargs
         )
+
+
+    def delete_order_v2(self, **kwargs):
+        """"
+        POST Cancel Order.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-cancel-order
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/delete-order"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
+
     def delete_order_by_client_order_id(self, **kwargs):
         """"
         POST Cancel Order.
@@ -497,6 +593,20 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             data=kwargs
         )
+
+    def delete_open_orders_v2(self, **kwargs):
+        """"
+        POST Cancel all Open Orders
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-cancel-all-open-orders
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/delete-open-orders"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
     def open_orders(self, **kwargs):
         """"
         GET Retrieve Open Orders.
@@ -511,6 +621,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def open_orders_v2(self, **kwargs):
+        """"
+        GET Retrieve Open Orders.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-open-orders
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/open-orders"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def history_orders(self, **kwargs):
         """"
         GET Retrieve All Order History.
@@ -520,6 +644,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/history-orders"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def history_orders_v2(self, **kwargs):
+        """"
+        GET Retrieve All Order History.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-all-order-history
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/history-orders"
         return self._get(
             endpoint=path,
             params=kwargs
@@ -733,4 +871,12 @@ class HttpPrivate(HttpPublic):
         return self._post(
             endpoint=path,
             data=kwargs
+        )
+
+    def all_favorites(self, **kwargs):
+
+        path = URL_SUFFIX + "/v1/all-favorites"
+        return self._get(
+            endpoint=path,
+            params=kwargs
         )
