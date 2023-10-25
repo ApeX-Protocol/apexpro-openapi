@@ -580,6 +580,20 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             data=kwargs
         )
+    def delete_order_by_client_order_id_v2(self, **kwargs):
+        """"
+        POST Cancel Order.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-cancel-order
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/delete-client-order-id"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
+
     def delete_open_orders(self, **kwargs):
         """"
         POST Cancel all Open Orders
@@ -677,6 +691,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def get_order_v2(self, **kwargs):
+        """"
+        GET Retrieve Order ID.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-order-id
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/get-order"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def get_order_by_client_order_id(self, **kwargs):
         """"
         GET Retrieve Order ID.
@@ -691,6 +719,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def get_order_by_client_order_id_v2(self, **kwargs):
+        """"
+        GET Retrieve Order ID.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-order-id
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/order-by-client-id"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def funding(self, **kwargs):
         """"
         GET Retrieve Funding Rate.
@@ -700,6 +742,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/funding"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def funding_v2(self, **kwargs):
+        """"
+        GET Retrieve Funding Rate.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-funding-rate
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/funding"
         return self._get(
             endpoint=path,
             params=kwargs
@@ -747,6 +803,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def historical_pnl_v2(self, **kwargs):
+        """"
+        GET Retrieve User Historial Profit and Loss.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-historial-profit-and-loss
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/historical-pnl"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def yesterday_pnl(self, **kwargs):
         """"
         GET Retrieve Yesterday's Profit & Loss.
@@ -761,6 +831,20 @@ class HttpPrivate(HttpPublic):
             params=kwargs
         )
 
+    def yesterday_pnl_v2(self, **kwargs):
+        """"
+        GET Retrieve Yesterday's Profit & Loss.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-yesterday-39-s-profit-amp-loss
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/yesterday-pnl"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
     def history_value(self, **kwargs):
         """"
         GET Retrieve Historical Asset Value.
@@ -770,6 +854,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/history-value"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def history_value_v2(self, **kwargs):
+        """"
+        GET Retrieve Historical Asset Value.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-historical-asset-value
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/history-value"
         return self._get(
             endpoint=path,
             params=kwargs
@@ -868,6 +966,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/set-initial-margin-rate"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
+
+    def set_initial_margin_rate_v2(self, **kwargs):
+        """"
+        get market price from orderbook
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-sets-the-initial-margin-rate-of-a-contract
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/set-initial-margin-rate"
         return self._post(
             endpoint=path,
             data=kwargs
