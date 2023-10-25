@@ -55,13 +55,13 @@ print(deleteOrderRes)
 deleteOrderRes = client.delete_order_by_client_order_id_v2(id="123456")
 print(deleteOrderRes)
 
-openOrdersRes = client.open_orders_v2()
+openOrdersRes = client.open_orders_v2(token='USDT')
 print(openOrdersRes)
 
-deleteOrdersRes = client.delete_open_orders(symbol="BTC-USDC,ETH-USDC")
+deleteOrdersRes = client.delete_open_orders(symbol="BTC-USDC,ETH-USDC", token='USDT')
 print(deleteOrdersRes)
 
-historyOrdersRes = client.history_orders_v2()
+historyOrdersRes = client.history_orders_v2(token='USDT')
 print(historyOrdersRes)
 
 getOrderRes = client.get_order_v2(id="123456")
@@ -70,7 +70,7 @@ print(getOrderRes)
 getOrderRes = client.get_order_by_client_order_id_v2(id="123456")
 print(getOrderRes)
 
-fundingRes = client.funding_v2(limit=100,page=0,symbol="BTC-USDC",side="BUY")
+fundingRes = client.funding_v2(limit=100,page=0,symbol="BTC-USDC",side="BUY",token='USDT')
 print(fundingRes)
 
 notifyListRes = client.notify_list(limit=100,page=0,unreadOnly="true",notifyCategory="1")
@@ -82,16 +82,16 @@ print(markNotifyReadRes)
 historicalPnlRes = client.historical_pnl_v2(limit=100,page=0,beginTimeInclusive=1651406864000,endTimeExclusive=1657105971171,symbol="BTC-USDC")
 print(historicalPnlRes)
 
-yesterdayPnlRes = client.yesterday_pnl_v2()
+yesterdayPnlRes = client.yesterday_pnl_v2(token='USDT')
 print(yesterdayPnlRes)
 
-historyValueRes = client.history_value_v2()
+historyValueRes = client.history_value_v2(token='USDT')
 print(historyValueRes)
 
 markAllNotifyReadRes = client.mark_all_notify_read()
 print(markAllNotifyReadRes)
 
-setInitialMarginRateRes = client.set_initial_margin_rate_v2(symbol="BTC-USDC",initialMarginRate="0.1")
+setInitialMarginRateRes = client.set_initial_margin_rate_v2(symbol="BTC-USDC",initialMarginRate="0.1",token='USDT')
 print(setInitialMarginRateRes)
 
 
