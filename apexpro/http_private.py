@@ -328,6 +328,7 @@ class HttpPrivate(HttpPublic):
         )
         self.user = userRes.get('data')
         return userRes
+    
 
     def modify_user(self, **kwargs):
         """"
@@ -938,6 +939,20 @@ class HttpPrivate(HttpPublic):
         """
 
         path = URL_SUFFIX + "/v1/account-balance"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )
+
+    def get_account_balance_v2(self, **kwargs):
+        """"
+        get market price from orderbook
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/?lang=zh-TW#privateapi-get-retrieve-user-account-balance
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v2/account-balance"
         return self._get(
             endpoint=path,
             params=kwargs

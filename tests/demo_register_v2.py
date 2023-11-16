@@ -9,10 +9,10 @@ from apexpro.http_private import HttpPrivate
 from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
 
 print("Hello, Apexpro")
-priKey = "xxx"
+priKey = "xxxx"
 
 client = HttpPrivate(APEX_HTTP_TEST, network_id=NETWORKID_TEST, eth_private_key=priKey)
-configs = client.configs()
+configs = client.configs_v2()
 
 stark_key_pair_with_y_coordinate = client.derive_stark_key(client.default_address)
 

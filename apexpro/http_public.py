@@ -96,3 +96,19 @@ class HttpPublic(HTTP):
             path=self.endpoint + suffix,
             query=kwargs
         )
+
+    def history_funding_v2(self, **kwargs):
+        """"
+        GET Retrieve Funding Rate History.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#publicapi-get-retrieve-funding-rate-history
+        :returns: Request results as dictionary.
+        """
+        suffix = URL_SUFFIX + "/v2/history-funding"
+        #if kwargs['symbol'] is not None:
+        #    kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )
