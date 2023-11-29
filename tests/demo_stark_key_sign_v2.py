@@ -15,6 +15,7 @@ print("Hello, Apexpro")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
 # need starkey for withdraw and createOrder
 
+
 key = 'your apiKey-key from register'
 secret = 'your apiKey-secret from register'
 passphrase = 'your apiKey-passphrase from register'
@@ -54,15 +55,10 @@ limitFeeRate = '0.0005'
 
 deleteOrdersRes = client.delete_open_orders_v2(token="USDT")
 print(deleteOrdersRes)
-
-for i in range(0,300):
-    createOrderRes = client.create_order_v2(symbol="BTC-USDT", side="SELL",
+createOrderRes = client.create_order_v2(symbol="BTC-USDT", side="SELL",
                                            type="LIMIT", size="0.01",expirationEpochSeconds= currentTime,
-                                           price="36890", limitFeeRate=limitFeeRate, timeInForce="POST_ONLY")
-    if len(createOrderRes.get('data')) < 5:
-        print(createOrderRes)
-    time.sleep(0.1)
-    print(i)
+                                           price="36890", limitFeeRate=limitFeeRate)
+
 
 #print(createOrderRes)
 

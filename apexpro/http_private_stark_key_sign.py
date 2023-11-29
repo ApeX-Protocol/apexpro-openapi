@@ -172,7 +172,8 @@ class HttpPrivateStark(HttpPrivate):
                      expirationEpochSeconds=None,
                      isPositionTpsl = False,
                      signature=None,
-                     sourceFlag=None,):
+                     sourceFlag=None,
+                     brokerId=None,):
         """"
         POST  create_order.
         client.create_order(symbol="BTC-USDC", side="SELL",
@@ -289,6 +290,7 @@ class HttpPrivateStark(HttpPrivate):
             'reduceOnly': reduceOnly,
             'isPositionTpsl': isPositionTpsl,
             'sourceFlag': sourceFlag,
+            'brokerId':brokerId,
         }
 
         path = URL_SUFFIX + "/v2/create-order"
