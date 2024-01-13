@@ -3,6 +3,7 @@ import sys
 import time
 
 from apexpro.helpers.util import wait_for_condition
+from apexpro.starkex.helpers import nonce_from_client_id
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
