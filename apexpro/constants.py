@@ -12,7 +12,7 @@ REGISTER_ENVID_TEST = 5
 
 # ------------ network_id ------------
 NETWORKID_MAIN = 1
-NETWORKID_TEST = 5
+NETWORKID_TEST = 11155111
 
 # ------------ Signature Types ------------
 SIGNATURE_TYPE_NO_PREPEND = 0

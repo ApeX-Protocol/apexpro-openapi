@@ -132,3 +132,10 @@ class WebSocket(_ApexWebSocketManager):
         """
         topic = "ws_accounts_v1"
         self._ws_private_subscribe(topic=topic, callback=callback)
+
+    def account_info_stream_v2(self, callback):
+        """
+        https://api-docs.pro.apex.exchange/#private-websocket
+        """
+        topic = "ws_accounts_v2"
+        self._ws_private_subscribe(topic=topic, callback=callback)
