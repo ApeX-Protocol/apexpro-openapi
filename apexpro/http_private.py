@@ -77,7 +77,6 @@ class HttpPrivate(HttpPublic):
                 request_path +
                 dataString
         )
-
         hashed = hmac.new(
             base64.standard_b64encode(
                 (self.api_key_credentials.get('secret')).encode(encoding='utf-8'),
@@ -328,7 +327,7 @@ class HttpPrivate(HttpPublic):
         )
         self.user = userRes.get('data')
         return userRes
-    
+
 
     def modify_user(self, **kwargs):
         """"

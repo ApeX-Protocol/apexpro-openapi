@@ -26,13 +26,26 @@ class HttpPrivateStark(HttpPrivate):
                      timeInForce="GOOD_TIL_CANCEL",
                      reduceOnly=False,
                      triggerPrice=None,
-                     triggerPriceType=None,
+                     triggerPriceType="INDEX",
                      trailingPercent=None,
                      clientId=None,
                      expiration=None,
                      expirationEpochSeconds=None,
                      isPositionTpsl = False,
                      signature=None,
+                     isOpenTpslOrder=False,
+                     isSetOpenSl=False,
+                     isSetOpenTp=False,
+                     slClientId=None,
+                     slPrice=None,
+                     slSide=None,
+                     slSize=None,
+                     slTriggerPrice=None,
+                     tpClientId=None,
+                     tpPrice=None,
+                     tpSide=None,
+                     tpSize=None,
+                     tpTriggerPrice=None,
                      sourceFlag=None,
                      brokerId=None,):
         """"
@@ -129,6 +142,88 @@ class HttpPrivateStark(HttpPrivate):
             float(expirationEpochSeconds) / ONE_HOUR_IN_SECONDS,
         ) + ORDER_SIGNATURE_EXPIRATION_BUFFER_HOURS
 
+        sl_limit_fee_rounded = None
+        slSignature = None
+        slTriggerPriceType = None
+        slExpiration = None
+        tp_limit_fee_rounded = None
+        tpSignature = None
+        tpTriggerPriceType = None
+        tpExpiration = None
+
+        if isOpenTpslOrder == True:
+            if isSetOpenSl == True:
+                slTriggerPriceType = triggerPriceType
+                slExpiration = expirationEpoch * 3600 * 1000
+                slClientId = slClientId or random_client_id()
+                slOrder_to_sign = SignableOrder(
+                    position_id=accountId,
+                    client_id=slClientId,
+                    market=symbol,
+                    side=slSide,
+                    human_size=slSize,
+                    human_price=slPrice,
+                    limit_fee=limitFeeRate,
+                    expiration_epoch_seconds=expirationEpochSeconds,
+                    synthetic_resolution=symbolData.get('starkExResolution'),
+                    synthetic_id=symbolData.get('starkExSyntheticAssetId'),
+                    collateral_id=currency.get('starkExAssetId'),
+                )
+                slSignature = slOrder_to_sign.sign(self.stark_private_key)
+
+                if slSide == ORDER_SIDE_BUY:
+                    slHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                    decimal.Decimal(slSize),
+                    decimal.Decimal(slPrice)
+                    )
+                    slFee = DECIMAL_CONTEXT_ROUND_UP.multiply(slHuman_cost, decimal.Decimal(limitFeeRate))
+                else:
+                    slHuman_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                        decimal.Decimal(slSize),
+                        decimal.Decimal(slPrice)
+                    )
+                    slFee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(slHuman_cost, decimal.Decimal(limitFeeRate))
+
+                sl_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                    decimal.Decimal(slFee),
+                    decimal.Decimal(currency.get('stepSize')), )
+
+            if isSetOpenTp == True:
+                tpTriggerPriceType = triggerPriceType
+                tpExpiration = expirationEpoch * 3600 * 1000
+                tpClientId = tpClientId or random_client_id()
+                tpOrder_to_sign = SignableOrder(
+                    position_id=accountId,
+                    client_id=tpClientId,
+                    market=symbol,
+                    side=tpSide,
+                    human_size=tpSize,
+                    human_price=tpPrice,
+                    limit_fee=limitFeeRate,
+                    expiration_epoch_seconds=expirationEpochSeconds,
+                    synthetic_resolution=symbolData.get('starkExResolution'),
+                    synthetic_id=symbolData.get('starkExSyntheticAssetId'),
+                    collateral_id=currency.get('starkExAssetId'),
+                )
+                tpSignature = tpOrder_to_sign.sign(self.stark_private_key)
+
+                if tpSide == ORDER_SIDE_BUY:
+                    tpHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                        decimal.Decimal(tpSize),
+                        decimal.Decimal(tpPrice)
+                    )
+                    tpFee = DECIMAL_CONTEXT_ROUND_UP.multiply(tpHuman_cost, decimal.Decimal(limitFeeRate))
+                else:
+                    tpHuman_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                        decimal.Decimal(tpSize),
+                        decimal.Decimal(tpPrice)
+                    )
+                    tpFee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(tpHuman_cost, decimal.Decimal(limitFeeRate))
+
+                tp_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                    decimal.Decimal(tpFee),
+                    decimal.Decimal(currency.get('stepSize')), )
+
         order = {
             'symbol': symbol,
             'side': side,
@@ -145,6 +240,27 @@ class HttpPrivateStark(HttpPrivate):
             'signature': signature,
             'reduceOnly': reduceOnly,
             'isPositionTpsl': isPositionTpsl,
+            'isOpenTpslOrder': isOpenTpslOrder,
+            'isSetOpenSl': isSetOpenSl,
+            'isSetOpenTp': isSetOpenTp,
+            'slClientOrderId': slClientId,
+            'slPrice': slPrice,
+            'slSide': slSide,
+            'slSize': slSize,
+            'slTriggerPrice': slTriggerPrice,
+            'slTriggerPriceType': slTriggerPriceType,
+            'slExpiration': slExpiration,
+            'slLimitFee': str(sl_limit_fee_rounded),
+            'slSignature': slSignature,
+            'tpClientOrderId': tpClientId,
+            'tpPrice': tpPrice,
+            'tpSide': tpSide,
+            'tpSize': tpSize,
+            'tpTriggerPrice': tpTriggerPrice,
+            'tpTriggerPriceType': tpTriggerPriceType,
+            'tpExpiration': tpExpiration,
+            'tpLimitFee': str(tp_limit_fee_rounded),
+            'tpSignature': tpSignature,
             'sourceFlag': sourceFlag,
             'brokerId':brokerId,
         }
@@ -174,6 +290,19 @@ class HttpPrivateStark(HttpPrivate):
                      expirationEpochSeconds=None,
                      isPositionTpsl = False,
                      signature=None,
+                     isOpenTpslOrder=False,
+                     isSetOpenSl=False,
+                     isSetOpenTp=False,
+                     slClientId=None,
+                     slPrice=None,
+                     slSide=None,
+                     slSize=None,
+                     slTriggerPrice=None,
+                     tpClientId=None,
+                     tpPrice=None,
+                     tpSide=None,
+                     tpSize=None,
+                     tpTriggerPrice=None,
                      sourceFlag=None,
                      brokerId=None,):
         """"
@@ -275,6 +404,88 @@ class HttpPrivateStark(HttpPrivate):
             float(expirationEpochSeconds) / ONE_HOUR_IN_SECONDS,
             ) + ORDER_SIGNATURE_EXPIRATION_BUFFER_HOURS
 
+        sl_limit_fee_rounded = None
+        slSignature = None
+        slTriggerPriceType = None
+        slExpiration = None
+        tp_limit_fee_rounded = None
+        tpSignature = None
+        tpTriggerPriceType = None
+        tpExpiration = None
+
+        if isOpenTpslOrder == True:
+            if isSetOpenSl == True:
+                slTriggerPriceType = triggerPriceType
+                slExpiration = expirationEpoch * 3600 * 1000
+                slClientId = slClientId or random_client_id()
+                slOrder_to_sign = SignableOrder(
+                    position_id=accountId,
+                    client_id=slClientId,
+                    market=symbol,
+                    side=slSide,
+                    human_size=slSize,
+                    human_price=slPrice,
+                    limit_fee=limitFeeRate,
+                    expiration_epoch_seconds=expirationEpochSeconds,
+                    synthetic_resolution=symbolData.get('starkExResolution'),
+                    synthetic_id=symbolData.get('starkExSyntheticAssetId'),
+                    collateral_id=currency.get('starkExAssetId'),
+                )
+                slSignature = slOrder_to_sign.sign(self.stark_private_key)
+
+                if slSide == ORDER_SIDE_BUY:
+                    slHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                        decimal.Decimal(slSize),
+                        decimal.Decimal(slPrice)
+                    )
+                    slFee = DECIMAL_CONTEXT_ROUND_UP.multiply(slHuman_cost, decimal.Decimal(limitFeeRate))
+                else:
+                    slHuman_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                        decimal.Decimal(slSize),
+                        decimal.Decimal(slPrice)
+                    )
+                    slFee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(slHuman_cost, decimal.Decimal(limitFeeRate))
+
+                sl_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                    decimal.Decimal(slFee),
+                    decimal.Decimal(currency.get('stepSize')), )
+
+            if isSetOpenTp == True:
+                tpTriggerPriceType = triggerPriceType
+                tpExpiration = expirationEpoch * 3600 * 1000
+                tpClientId = tpClientId or random_client_id()
+                tpOrder_to_sign = SignableOrder(
+                    position_id=accountId,
+                    client_id=tpClientId,
+                    market=symbol,
+                    side=tpSide,
+                    human_size=tpSize,
+                    human_price=tpPrice,
+                    limit_fee=limitFeeRate,
+                    expiration_epoch_seconds=expirationEpochSeconds,
+                    synthetic_resolution=symbolData.get('starkExResolution'),
+                    synthetic_id=symbolData.get('starkExSyntheticAssetId'),
+                    collateral_id=currency.get('starkExAssetId'),
+                )
+                tpSignature = tpOrder_to_sign.sign(self.stark_private_key)
+
+                if tpSide == ORDER_SIDE_BUY:
+                    tpHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                        decimal.Decimal(tpSize),
+                        decimal.Decimal(tpPrice)
+                    )
+                    tpFee = DECIMAL_CONTEXT_ROUND_UP.multiply(tpHuman_cost, decimal.Decimal(limitFeeRate))
+                else:
+                    tpHuman_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                        decimal.Decimal(tpSize),
+                        decimal.Decimal(tpPrice)
+                    )
+                    tpFee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(tpHuman_cost, decimal.Decimal(limitFeeRate))
+
+                tp_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                    decimal.Decimal(tpFee),
+                    decimal.Decimal(currency.get('stepSize')), )
+
         order = {
             'symbol': symbol,
             'side': side,
@@ -291,6 +502,27 @@ class HttpPrivateStark(HttpPrivate):
             'signature': signature,
             'reduceOnly': reduceOnly,
             'isPositionTpsl': isPositionTpsl,
+            'isOpenTpslOrder': isOpenTpslOrder,
+            'isSetOpenSl': isSetOpenSl,
+            'isSetOpenTp': isSetOpenTp,
+            'slClientOrderId': slClientId,
+            'slPrice': slPrice,
+            'slSide': slSide,
+            'slSize': slSize,
+            'slTriggerPrice': slTriggerPrice,
+            'slTriggerPriceType': slTriggerPriceType,
+            'slExpiration': slExpiration,
+            'slLimitFee': str(sl_limit_fee_rounded),
+            'slSignature': slSignature,
+            'tpClientOrderId': tpClientId,
+            'tpPrice': tpPrice,
+            'tpSide': tpSide,
+            'tpSize': tpSize,
+            'tpTriggerPrice': tpTriggerPrice,
+            'tpTriggerPriceType': tpTriggerPriceType,
+            'tpExpiration': tpExpiration,
+            'tpLimitFee': str(tp_limit_fee_rounded),
+            'tpSignature': tpSignature,
             'sourceFlag': sourceFlag,
             'brokerId':brokerId,
         }

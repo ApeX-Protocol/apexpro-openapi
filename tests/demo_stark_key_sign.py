@@ -27,6 +27,8 @@ public_key_y_coordinate = 'your stark_public_key_y_coordinate from register'
 private_key = 'your stark_private_key from register'
 
 
+# sample6
+# Create a TP/SL order
 client = HttpPrivateStark(APEX_HTTP_TEST, network_id=NETWORKID_TEST,
                           stark_public_key=public_key,
                           stark_private_key=private_key,
@@ -80,7 +82,7 @@ createOrderRes = client.create_order(symbol="BTC-USDC", side="SELL",
 print(createOrderRes)
 
 # sample5
-# Create a TP/SL order
+# Create a Position TP/SL order
 # first, Set a slippage to get an acceptable price
 # if timeInForce="GOOD_TIL_CANCEL" or "POST_ONLY", slippage is recommended to be greater than 0.1
 # if timeInForce="FILL_OR_KILL" or "IMMEDIATE_OR_CANCEL", slippage is recommended to be greater than 0.2
@@ -93,6 +95,33 @@ createOrderRes = client.create_order(symbol="BTC-USDC", side="BUY", isPositionTp
                                      type="TAKE_PROFIT_MARKET", size="0.1", price=price, limitFeeRate=limitFeeRate,
                                      expirationEpochSeconds= currentTime, triggerPriceType="INDEX", triggerPrice="28888" )
 print(createOrderRes)
+
+# sample6
+# Create a  TP/SL order
+# first, Set a slippage to get an acceptable slPrice or tpPrice
+#slippage is recommended to be greater than 0.1
+# when buying, the price = price*(1 + slippage). when selling, the price = price*(1 - slippage)
+slippage = decimal.Decimal("-0.1")
+slPrice =  round_size(decimal.Decimal("38000") * (decimal.Decimal("1") + slippage), symbolData.get('tickSize'))
+tpPrice =  round_size(decimal.Decimal("49000") * (decimal.Decimal("1") + slippage), symbolData.get('tickSize'))
+
+createOrderRes = client.create_order(symbol="BTC-USDC", side="BUY",
+                                     type="LIMIT", size="0.01", expirationEpochSeconds= currentTime,
+                                     price="41000", limitFeeRate=limitFeeRate,
+                                     isOpenTpslOrder=True,
+                                     isSetOpenSl=True,
+                                     slPrice=slPrice,
+                                     slSide="SELL",
+                                     slSize="0.01",
+                                     slTriggerPrice="38000",
+                                     isSetOpenTp=True,
+                                     tpPrice=tpPrice,
+                                     tpSide="SELL",
+                                     tpSize="0.01",
+                                     tpTriggerPrice="49000",
+                                     )
+print(createOrderRes)
+
 
 #createWithdrawRes = client.create_withdrawal(amount='1001',expirationEpochSeconds= currentTime,asset='USDC')
 #print(createWithdrawRes)
