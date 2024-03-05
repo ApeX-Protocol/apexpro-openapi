@@ -27,8 +27,6 @@ public_key_y_coordinate = 'your stark_public_key_y_coordinate from register'
 private_key = 'your stark_private_key from register'
 
 
-# sample6
-# Create a TP/SL order
 client = HttpPrivateStark(APEX_HTTP_TEST, network_id=NETWORKID_TEST,
                           stark_public_key=public_key,
                           stark_private_key=private_key,
@@ -144,3 +142,5 @@ crossWithdrawRes = client.cross_chain_withdraw(amount='1003',expirationEpochSeco
 print(crossWithdrawRes)
 
 print("end, Apexpro")
+
+
