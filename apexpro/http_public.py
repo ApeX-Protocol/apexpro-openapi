@@ -25,7 +25,7 @@ class HttpPublic(HTTP):
         :returns: Request results as dictionary.
         """
         suffix = URL_SUFFIX + "/v1/depth"
-        if kwargs['symbol'] is not None:
+        if kwargs.get('symbol') is not None:
             kwargs['symbol'] = kwargs['symbol'].replace('-', '')
         return self._submit_request(
             method='GET',
@@ -41,7 +41,7 @@ class HttpPublic(HTTP):
         :returns: Request results as dictionary.
         """
         suffix = URL_SUFFIX + "/v1/trades"
-        if kwargs['symbol'] is not None:
+        if kwargs.get('symbol') is not None:
             kwargs['symbol'] = kwargs['symbol'].replace('-', '')
         return self._submit_request(
             method='GET',
@@ -57,7 +57,7 @@ class HttpPublic(HTTP):
         :returns: Request results as dictionary.
         """
         suffix = URL_SUFFIX + "/v1/klines"
-        if kwargs['symbol'] is not None:
+        if kwargs.get('symbol') is not None:
             kwargs['symbol'] = kwargs['symbol'].replace('-', '')
         return self._submit_request(
             method='GET',
@@ -73,7 +73,7 @@ class HttpPublic(HTTP):
         :returns: Request results as dictionary.
         """
         suffix = URL_SUFFIX + "/v1/ticker"
-        if kwargs['symbol'] is not None:
+        if kwargs.get('symbol') is not None:
             kwargs['symbol'] = kwargs['symbol'].replace('-', '')
         return self._submit_request(
             method='GET',
@@ -105,8 +105,18 @@ class HttpPublic(HTTP):
         :returns: Request results as dictionary.
         """
         suffix = URL_SUFFIX + "/v2/history-funding"
-        #if kwargs['symbol'] is not None:
+        #if kwargs.get('symbol') is not None:
         #    kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )
+
+    def test_ticker(self, **kwargs):
+        suffix = URL_SUFFIX + "/v1/test-ticker"
+        if kwargs.get('symbol') is not None:
+            kwargs['symbol'] = kwargs['symbol'].replace('-', '')
         return self._submit_request(
             method='GET',
             path=self.endpoint + suffix,
