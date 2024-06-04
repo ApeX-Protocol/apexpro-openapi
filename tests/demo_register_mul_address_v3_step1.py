@@ -14,49 +14,37 @@ print("Hello, Apexpro")
 priKey = "your eth private key"
 
 client = HttpPrivate(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST, eth_private_key=priKey)
-configs = client.configs_v2()
-
+configs = client.configs_v3()
 
 zkKeys = client.derive_zk_key(client.default_address)
 
 nonceRes = client.generate_nonce_v3(refresh="false", l2Key=zkKeys['l2Key'],ethAddress=client.default_address, chainId=NETWORKID_TEST)
 
-#api_key = client.recover_api_key_credentials(nonce=nonceRes['data']['nonce'], ethereum_address=client.default_address)
-#print(api_key)
 regRes = client.register_user_v3(nonce=nonceRes['data']['nonce'],l2Key=zkKeys['l2Key'], seeds=zkKeys['seeds'],ethereum_address=client.default_address,
                                  eth_mul_address="your mul eth address")
 key = regRes['data']['apiKey']['key']
 secret = regRes['data']['apiKey']['secret']
 passphrase = regRes['data']['apiKey']['passphrase']
 
+time.sleep(10)
 accountRes = client.get_account_v3()
 print(accountRes)
 
 #back stark_key_pair, apiKey,and accountId for private Api or create-oreder or withdraw
+
+seeds = zkKeys.get('seeds')
+l2Key = zkKeys.get('l2Key')
+pubKeyHash = zkKeys.get('pubKeyHash')
+
+#back zkKeys, seeds, l2Key and pubKeyHash for register_step2
 print(zkKeys)
 print(regRes['data']['account']['id'])
 print(regRes['data']['apiKey'])
 
-changeRes = client.change_pub_key_v3(chainId=3, ethPrivateKey=priKey, zkAccountId = accountRes.get('spotAccount').get('zkAccountId'), subAccountId = accountRes.get('spotAccount').get('defaultSubAccountId'),
+changeRes = client.change_pub_key_v3(chainId=11, seeds=zkKeys.get('seeds'), zkAccountId = accountRes.get('spotAccount').get('zkAccountId'), subAccountId = accountRes.get('spotAccount').get('defaultSubAccountId'),
                                      newPkHash = zkKeys.get('pubKeyHash'), feeToken="140", fee="0", nonce= accountRes.get('spotAccount').get('nonce'), l2Key= zkKeys.get('l2Key'), ethSignatureType='Onchain')
 print(changeRes)
 print("end, Apexpro")
 
 
-def handle_account():
-    print("current time:", time.time())
-    accountRes = client.get_account_v3()
-    print(accountRes)
-    if accountRes.get('spotAccount').get('zkAccountId') == '0':
-        changeRes = client.change_pub_key_v3(chainId=11, ethPrivateKey=priKey, zkAccountId = accountRes.get('spotAccount').get('zkAccountId'), subAccountId = accountRes.get('spotAccount').get('defaultSubAccountId'),
-                                     newPkHash = zkKeys.get('pubKeyHash'), feeToken="140", fee="0", nonce= accountRes.get('spotAccount').get('nonce'), l2Key= zkKeys.get('l2Key'), ethSignatureType='Onchain')
-        print(changeRes)
-        timer.cancel()
-
-while True:
-    # Run your main trading logic here.
-    time.sleep(2)
-    timer = Timer(10, handle_account)
-    timer.start()
-    timer.join()
 

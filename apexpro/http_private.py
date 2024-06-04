@@ -1163,7 +1163,7 @@ class HttpPrivate(HttpPublic):
 
     def change_pub_key_v3(self,
                           chainId,
-                          ethPrivateKey,
+                          seeds,
                           zkAccountId,
                           newPkHash,
                           feeToken,
@@ -1181,17 +1181,25 @@ class HttpPrivate(HttpPublic):
 
         builder = sdk.ChangePubKeyBuilder(chainId, int(zkAccountId), int(subAccountId), newPkHash, int(feeToken), fee, int(nonce), ethSignature, int(times))
         tx = sdk.ChangePubKey(builder)
-        signer = sdk.Signer(ethPrivateKey, sdk.L1SignerType.ETH())
+        #signer = sdk.Signer(ethPrivateKey, sdk.L1SignerType.ETH())
+
+        seedsByte = bytes.fromhex(seeds)
+        signerSeed = sdk.ZkLinkSigner.new_from_seed(seedsByte)
 
         authSigner = {}
 
-        if ethSignatureType == 'Onchain':
-            authSigner = json.loads(signer.sign_change_pubkey_with_onchain_auth_data(tx).tx)
-        else:
-            authSigner = json.loads(signer.sign_change_pubkey_with_eth_ecdsa_auth(tx).tx)
+        #if ethSignatureType == 'Onchain':
+        auth_data = signerSeed.sign_musig(tx.get_bytes()) #signer.sign_change_pubkey_with_onchain_auth_data(tx)
+        #authSigner = json.loads(auth_data.tx)
+        #else:
+        #    authSigner = json.loads(signer.sign_change_pubkey_with_eth_ecdsa_auth(tx).tx)
 
-        signature = authSigner.get('signature').get('signature')
-        ethSignature = authSigner.get('ethAuthData').get('ethSignature')
+        #signature = authSigner.get('signature').get('signature')
+        #ethSignature = authSigner.get('ethAuthData').get('ethSignature')
+        signature = auth_data.signature
+        print(builder)
+        print(signature)
+
         return self._post(
             endpoint=path,
             data={
