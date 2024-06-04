@@ -4,6 +4,9 @@ APEX_HTTP_TEST = 'https://testnet.pro.apex.exchange'
 APEX_WS_MAIN = 'wss://quote.pro.apex.exchange'
 APEX_WS_TEST = 'wss://quote-qa.pro.apex.exchange'
 
+APEX_OMNI_HTTP_MAIN = 'https://pro.omni.apex.exchange'
+APEX_OMNI_HTTP_TEST = 'https://qa.omni.apex.exchange'
+
 URL_SUFFIX = "/api"
 
 # ------------ register_env_id ------------
@@ -53,3 +56,5 @@ COLLATERAL_TOKEN_DECIMALS = 6
 # ------------ Off-Chain Ethereum-Signed Actions ------------
 OFF_CHAIN_ONBOARDING_ACTION = 'ApeX Onboarding' # action:ApeX Onboarding  onlySignOn:https://pro.apex.exchange nonce:1188491033265307648
 OFF_CHAIN_KEY_DERIVATION_ACTION = 'L2 Key' #{"name": "ApeX","version": "1.0","envId": 1,"action": "L2 Key","onlySignOn": "https://pro.apex.exchange"}
+
+

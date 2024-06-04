@@ -119,3 +119,29 @@ class SignWithKey(Signer):
             SIGNATURE_TYPE_PERSONAL,
         )
         return typed_signature
+
+    def sign_zk_person(
+            self,
+            message_hash,
+            opt_signer_address,
+    ):
+        if (
+                opt_signer_address is not None and
+                opt_signer_address != self.address
+        ):
+            raise ValueError(
+                'signer_address is {} but Ethereum key (eth_private_key / '
+                'web3_account) corresponds to address {}'.format(
+                    opt_signer_address,
+                    self.address,
+                ),
+            )
+
+        signed_message = eth_account.Account._sign_hash(
+            message_hash.hex(),
+            self._private_key,
+        )
+        signature = util.fix_raw_signature(
+            signed_message.signature.hex()
+        )
+        return signature

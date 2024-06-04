@@ -107,11 +107,11 @@ class HTTP:
             handler.setLevel(logging.INFO)
             self.logger.addHandler(handler)
 
-        self.logger.warning(
-            'This HTTP class is maintained for compatibility purposes. You '
-            'should prefer importing market-specific classes, like so: '
-            'from apexpro import HTTP; '
-        )
+        #self.logger.warning(
+        #    'This HTTP class is maintained for compatibility purposes. You '
+        #    'should prefer importing market-specific classes, like so: '
+        #    'from apexpro import HTTP; '
+        #)
 
         self.logger.debug('Initializing HTTP session.')
         self.log_requests = False
@@ -323,6 +323,15 @@ class HTTP:
         self.usdcConfigV2 = configs['data']['usdcConfig']
         self.usdtConfigV2 = configs['data']['usdtConfig']
         self.starkeySigner = SignOnboardingAction(self.eth_signer, self.env_id)
+        return configs
+
+    def configs_v3(self, **kwargs):
+        suffix = URL_SUFFIX + "/v3/symbols"
+        configs = self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix
+        )
+        self.configV3 = configs['data']
         return configs
 
     def _submit_request(self, method=None, path=None, query=None, headers=None):

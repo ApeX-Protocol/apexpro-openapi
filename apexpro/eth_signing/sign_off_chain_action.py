@@ -61,6 +61,24 @@ class SignOffChainAction(object):
         )
         return typed_signature
 
+    def sign_zk_message(
+            self,
+            signer_address,
+            msgHeader,
+    ):
+        eip712_message = self.get_zk_person_message(signer_address)
+        #eip712_message = '{"name": "apex","version": "1.0","envId": 5,"action": "L2 Key","onlySignOn": "https://trade.apex.exchange"}'
+
+        msgStr ='\n'.join('{key}: {value}'.format(
+            key=x[0], value=x[1]) for x in eip712_message.items())
+
+        message_hash = util.hash_person(msgHeader+ '\n' + msgStr)
+        signature = self.signer.sign_zk_person(
+            message_hash,
+            signer_address,
+        )
+        return signature
+
 
     def verify(
         self,
@@ -114,6 +132,15 @@ class SignOffChainAction(object):
             'envId': self.network_id,
             'action': "L2 Key",
             'onlySignOn': 'https://pro.apex.exchange',
+        }
+
+    def get_zk_person_message(
+            self,
+            address,
+    ):
+        return {
+            'Address': address,
+            'Action': 'ApeX Omni Onboarding',
         }
 
     def get_eip712_hash(self, struct_hash):

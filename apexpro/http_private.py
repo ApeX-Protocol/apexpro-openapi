@@ -2,13 +2,20 @@ import base64
 import decimal
 import hashlib
 import hmac
+import json
 import math
+import time
+
+import zklink_sdk as sdk
+
+from apexpro.eth_signing import util
 
 from apexpro.http_public import HttpPublic
 from web3 import Web3
 
 from apexpro import HTTP, private_key_to_public_key_pair_hex
-from apexpro.constants import URL_SUFFIX, OFF_CHAIN_KEY_DERIVATION_ACTION, OFF_CHAIN_ONBOARDING_ACTION, ORDER_SIDE_BUY
+from apexpro.constants import URL_SUFFIX, OFF_CHAIN_KEY_DERIVATION_ACTION, OFF_CHAIN_ONBOARDING_ACTION, ORDER_SIDE_BUY, \
+    APEX_OMNI_HTTP_TEST
 from apexpro.helpers.request_helpers import generate_query_path, \
     generate_now, random_client_id, iso_to_epoch_seconds, epoch_seconds_to_iso
 from apexpro.starkex.constants import ONE_HOUR_IN_SECONDS, ORDER_SIGNATURE_EXPIRATION_BUFFER_HOURS
@@ -102,6 +109,29 @@ class HttpPrivate(HttpPublic):
             path=path,
             data={
                 'starkKey': starkKey,
+                'ethAddress': ethAddress,
+                'chainId': chainId,
+                'category': 'CATEGORY_API',
+                'refresh': refresh,
+            }
+        )
+
+    def generate_nonce_v3(self, l2Key, ethAddress, chainId,
+                       refresh="false"
+                       ):
+        """"
+        POST: Generate nonce.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-generate-nonce
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v3/generate-nonce"
+        return self._private_request(
+            method="POST",
+            path=path,
+            data={
+                'l2Key': l2Key,
                 'ethAddress': ethAddress,
                 'chainId': chainId,
                 'category': 'CATEGORY_API',
@@ -237,6 +267,88 @@ class HttpPrivate(HttpPublic):
             self.account = onboardingRes.get('data').get('account')
         return onboardingRes
 
+    def register_user_v3(
+            self,
+            nonce,
+            l2Key=None,
+            seeds=None,
+            ethereum_address=None,
+            referred_by_affiliate_link=None,
+            country=None,
+            isLpAccount=None,
+            eth_mul_address=None,
+            sourceFlag=None,
+    ):
+        """"
+        POST Registration & Onboarding.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-post-registration-amp-onboarding
+        :returns: Request results as dictionary.
+        """
+        l2_key = l2Key or self.zk_l2Key
+        l2_seeds = seeds or self.zk_seeds
+
+        if l2_key is None:
+            raise ValueError(
+                'zk l2Key is required'
+            )
+
+        if l2_seeds is None:
+            raise ValueError(
+                'zk seeds is required'
+            )
+
+        eth_address = ethereum_address or self.default_address
+
+        msg = str(l2_key.removeprefix('0x') + ethereum_address + nonce).lower()
+        message = hashlib.sha256()
+        message.update(msg.encode())  # Encode as UTF-8.
+        msgHash = message.digest()
+
+
+        EC_ORDER = '3618502788666131213697322783095070105526743751716087489154079457884512865583';
+
+        bn1 = int(msgHash.hex(), 16)
+        bn2 = int (EC_ORDER, 10)
+
+        bn3 = hex(bn1)
+        signMsg = hex(bn1.__mod__(bn2))
+
+        seeds = bytes.fromhex(l2_seeds)
+        signerSeed = sdk.ZkLinkSigner.new_from_seed(seeds)
+        signatureOnboard = signerSeed.sign_musig(signMsg.removeprefix('0x').encode())
+
+        apiKeyHash = hex(bn1).removeprefix('0x') + '|' + signMsg.removeprefix('0x')
+
+        path = URL_SUFFIX + "/v3/onboarding"
+        onboardingRes = self._private_request(
+            method="POST",
+            path=path,
+            data= {
+                'l2Key': l2_key,
+                'referredByAffiliateLink': referred_by_affiliate_link,
+                'ethereumAddress': eth_address,
+                'country': country,
+                'category': 'CATEGORY_API',
+                'isLpAccount': isLpAccount,
+                'ethMulAddress': eth_mul_address,
+                'sourceFlag': sourceFlag,
+                'apiKeyHash': apiKeyHash,
+            },
+            headers={
+                'APEX-SIGNATURE': signatureOnboard.signature,
+                'APEX-ETHEREUM-ADDRESS': eth_address,
+            }
+        )
+        #if onboardingRes.get('data') is not None:
+        #    self.user = onboardingRes.get('data').get('user')
+        #    self.account = onboardingRes.get('data').get('account')
+        key = onboardingRes['data']['apiKey']['key']
+        secret = onboardingRes['data']['apiKey']['secret']
+        passphrase = onboardingRes['data']['apiKey']['passphrase']
+        self.api_key_credentials = {'key': key,'secret': secret, 'passphrase': passphrase}
+        return onboardingRes
+
     def derive_stark_key(
             self,
             ethereum_address=None,
@@ -256,6 +368,32 @@ class HttpPrivate(HttpPublic):
             'public_key': public_x,
             'public_key_y_coordinate': public_y,
             'private_key': private_key_hex
+        }
+
+    def derive_zk_key(
+            self,
+            ethereum_address=None,
+    ):
+        msgHeader = 'ApeX Omni Mainnet'
+        if self.endpoint == APEX_OMNI_HTTP_TEST:
+            msgHeader = 'ApeX Omni Testnet'
+        signature = self.starkeySigner.sign_zk_message(
+            ethereum_address or self.default_address,
+            msgHeader,
+            )
+
+        seedstr = signature.removeprefix("0x")
+        seeds = bytes.fromhex(seedstr)
+        self.zk_seeds = seedstr
+        signerSeed = sdk.ZkLinkSigner.new_from_seed(seeds)
+        pubKey = signerSeed.public_key()
+        self.zk_l2Key = pubKey
+        pubKeyHash = sdk.get_public_key_hash(pubKey)
+
+        return {
+            'seeds': seedstr,
+            'l2Key': pubKey,
+            'pubKeyHash': pubKeyHash
         }
 
     def recover_api_key_credentials(
@@ -391,6 +529,22 @@ class HttpPrivate(HttpPublic):
         )
         self.account = accountRes.get('data')
         return accountRes
+
+    def get_account_v3(self, **kwargs):
+        """"
+        GET Retrieve User Account Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-retrieve-user-account-data
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v3/account"
+        accountRes =  self._get(
+            endpoint=path,
+            params=kwargs
+        )
+        self.account_V3 = accountRes.get('data')
+        return accountRes.get('data')
 
     def transfers(self, **kwargs):
         """"
@@ -1005,4 +1159,53 @@ class HttpPrivate(HttpPublic):
         return self._get(
             endpoint=path,
             params=kwargs
+        )
+
+    def change_pub_key_v3(self,
+                          chainId,
+                          ethPrivateKey,
+                          zkAccountId,
+                          newPkHash,
+                          feeToken,
+                          nonce,
+                          l2Key,
+                          subAccountId='0',
+                          fee='0',
+                          ethSignatureType='EthECDSA',
+                          signature=None,
+                          ethSignature=None,
+                          timestamp=None,):
+        path = URL_SUFFIX + "/v3/change-pub-key"
+
+        times = timestamp or int(time.time())
+
+        builder = sdk.ChangePubKeyBuilder(chainId, int(zkAccountId), int(subAccountId), newPkHash, int(feeToken), fee, int(nonce), ethSignature, int(times))
+        tx = sdk.ChangePubKey(builder)
+        signer = sdk.Signer(ethPrivateKey, sdk.L1SignerType.ETH())
+
+        authSigner = {}
+
+        if ethSignatureType == 'Onchain':
+            authSigner = json.loads(signer.sign_change_pubkey_with_onchain_auth_data(tx).tx)
+        else:
+            authSigner = json.loads(signer.sign_change_pubkey_with_eth_ecdsa_auth(tx).tx)
+
+        signature = authSigner.get('signature').get('signature')
+        ethSignature = authSigner.get('ethAuthData').get('ethSignature')
+        return self._post(
+            endpoint=path,
+            data={
+                'chainId': chainId,
+                'zkAccountId': zkAccountId,
+                'subAccountId' : subAccountId,
+                'newPkHash': newPkHash,
+                'feeToken': feeToken,
+                'nonce':nonce,
+                'l2Key': l2Key,
+                'fee': fee,
+                'ethSignatureType': ethSignatureType,
+                'signature': signature,
+                'ethSignature': ethSignature,
+                'timestamp':times
+            }
         )
