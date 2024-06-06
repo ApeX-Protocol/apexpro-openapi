@@ -340,9 +340,9 @@ class HttpPrivate(HttpPublic):
                 'APEX-ETHEREUM-ADDRESS': eth_address,
             }
         )
-        #if onboardingRes.get('data') is not None:
-        #    self.user = onboardingRes.get('data').get('user')
-        #    self.account = onboardingRes.get('data').get('account')
+        if onboardingRes.get('data') is not None:
+            self.user = onboardingRes.get('data').get('user')
+            self.accountV3 = onboardingRes.get('data').get('account')
         key = onboardingRes['data']['apiKey']['key']
         secret = onboardingRes['data']['apiKey']['secret']
         passphrase = onboardingRes['data']['apiKey']['passphrase']
@@ -543,7 +543,7 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
-        self.account_V3 = accountRes.get('data')
+        self.accountV3 = accountRes.get('data')
         return accountRes.get('data')
 
     def transfers(self, **kwargs):
@@ -627,6 +627,7 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
+
 
     def transfer_limit(self, **kwargs):
         """"
@@ -1180,9 +1181,9 @@ class HttpPrivate(HttpPublic):
 
         times = timestamp or int(time.time())
 
-        signer1 = sdk.ZkLinkSigner().new_from_hex_eth_signer(ethPrivateKey)
-        pubKey = signer1.public_key()
-        newPkHash = sdk.get_public_key_hash(pubKey)
+        #signer1 = sdk.ZkLinkSigner().new_from_hex_eth_signer(ethPrivateKey)
+        #pubKey = signer1.public_key()
+        #newPkHash = sdk.get_public_key_hash(pubKey)
 
         builder = sdk.ChangePubKeyBuilder(chainId, int(zkAccountId), int(subAccountId), newPkHash, int(feeToken), fee, int(nonce), ethSignature, int(times))
         tx = sdk.ChangePubKey(builder)
@@ -1216,4 +1217,18 @@ class HttpPrivate(HttpPublic):
                 'ethSignature': ethSignature,
                 'timestamp':times
             }
+        )
+
+    def withdraw_fee_v3(self, **kwargs):
+        """"
+        GET Fast & Cross-Chain Withdrawal Fees.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#privateapi-get-fast-amp-cross-chain-withdrawal-fees
+        :returns: Request results as dictionary.
+        """
+
+        path = URL_SUFFIX + "/v3/withdraw-fee"
+        return self._get(
+            endpoint=path,
+            params=kwargs
         )

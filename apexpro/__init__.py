@@ -76,6 +76,8 @@ class HTTP:
             stark_private_key=None,
             stark_public_key=None,
             stark_public_key_y_coordinate=None,
+            zk_seeds=None,
+            zk_l2Key=None,
             web3=None,
             web3_account=None,
             web3_provider=None,
@@ -122,7 +124,8 @@ class HTTP:
         self.stark_private_key = stark_private_key
         self.api_key_credentials = api_key_credentials
         self.stark_public_key_y_coordinate = stark_public_key_y_coordinate
-
+        self.zk_seeds = zk_seeds
+        self.zk_l2Key = zk_l2Key
         self.web3 = None
         self._eth = None
         self.eth_signer = None
