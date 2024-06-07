@@ -343,10 +343,10 @@ class HttpPrivate(HttpPublic):
         if onboardingRes.get('data') is not None:
             self.user = onboardingRes.get('data').get('user')
             self.accountV3 = onboardingRes.get('data').get('account')
-        key = onboardingRes['data']['apiKey']['key']
-        secret = onboardingRes['data']['apiKey']['secret']
-        passphrase = onboardingRes['data']['apiKey']['passphrase']
-        self.api_key_credentials = {'key': key,'secret': secret, 'passphrase': passphrase}
+            key = onboardingRes['data']['apiKey']['key']
+            secret = onboardingRes['data']['apiKey']['secret']
+            passphrase = onboardingRes['data']['apiKey']['passphrase']
+            self.api_key_credentials = {'key': key,'secret': secret, 'passphrase': passphrase}
         return onboardingRes
 
     def derive_stark_key(
