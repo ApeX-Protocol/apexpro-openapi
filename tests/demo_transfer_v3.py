@@ -15,13 +15,12 @@ from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NE
 
 print("Hello, Apexpro")
 
+key = ''
+passphrase = ''
+secret = ''
 
-key = 'your apiKey-key from register'
-secret = 'your apiKey-secret from register'
-passphrase = 'your apiKey-passphrase from register'
-
-seeds = 'your zk seeds from register'
-l2Key = 'your l2Key seeds from register'
+seeds = ''
+l2Key = ''
 
 
 client = HttpPrivateSign(APEX_HTTP_TEST, network_id=NETWORKID_TEST,
@@ -45,8 +44,14 @@ accountData = client.get_account_v3()
 #print(createTransferRes)
 
 #smple4 contract transfer_out
-createContractTransferRes = client.create_contract_transfer_out_v3(amount='1.1',asset='USDT')
+#createContractTransferRes = client.create_contract_transfer_out_v3(amount='1.1',asset='USDT')
+#print(createContractTransferRes)
+
+#smple4 contract contract_transfer_to_address
+createContractTransferRes = client.create_contract_transfer_to_address_v3(amount='1.1',asset='USDT',receiverAddress='0xfab6256aeef3be7805d3138be8fe1369f716ebc5',receiverAccountId='585750146675900485',receiverL2Key='0x04a234f299958150707451f649208fd085680bf3e1be432acb533eb2cc06082a')
 print(createContractTransferRes)
+
+
 
 
 print("end, Apexpro")

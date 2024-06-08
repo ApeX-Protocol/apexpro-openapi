@@ -477,7 +477,7 @@ class HttpPrivateSign(HttpPrivateStark):
 
         ethAddress = ethAddress or self.accountV3.get('ethereumAddress')
 
-        receiverSubAccountId = receiverSubAccountId or self.configV3.get('spotConfig').get('global').get('contractAssetPoolSubAccount')
+        receiverSubAccountId = receiverSubAccountId or 0
 
         message = hashlib.sha256()
         message.update(clientId.encode())  # Encode as UTF-8.
@@ -506,7 +506,7 @@ class HttpPrivateSign(HttpPrivateStark):
         amountStr = (decimal.Decimal(amount) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
 
         builder = sdk.TransferBuilder(
-            int(accountId),  ethAddress, int(receiverSubAccountId), int(subAccountId),  int(tokenId), amountStr.__str__(), '0', int(nonce),  int(timestampSeconds)
+            int(accountId),  ethAddress, int(subAccountId), int(receiverSubAccountId),  int(tokenId), amountStr.__str__(), '0', int(nonce),  int(timestampSeconds)
         )
 
         tx = sdk.Transfer(builder)
@@ -526,6 +526,87 @@ class HttpPrivateSign(HttpPrivateStark):
         }
 
         path = URL_SUFFIX + "/v3/contract-transfer-out"
+        return self._post(
+            endpoint=path,
+            data=transferData
+        )
+
+    def create_contract_transfer_to_address_v3(self,
+                                        amount,
+                                        asset,
+                                        receiverL2Key,
+                                        receiverAccountId,
+                                        receiverAddress,
+                                        receiverSubAccountId=None,
+                                        nonce=None,
+                                        tokenId=None,
+                                        subAccountId=None,
+                                        clientId=None,
+                                        timestampSeconds=None,
+                                        accountId=None,
+                                        signature=None, ):
+
+        clientId = clientId or random_client_id()
+        if not self.zk_seeds:
+            raise Exception(
+                'No signature provided and client was not ' +
+                'initialized with zk_seeds'
+            )
+
+        timestampSeconds =  timestampSeconds or int(time.time())
+        timestampSeconds = int(timestampSeconds + 3600 * 24 * 28)
+        accountId = accountId or self.accountV3.get('id')
+        subAccountId = subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
+        receiverSubAccountId = receiverSubAccountId or 0
+
+        message = hashlib.sha256()
+        message.update(clientId.encode())  # Encode as UTF-8.
+        nonceHash = message.hexdigest()
+        nonceInt = int(nonceHash, 16)
+        maxUint32 = np.iinfo(np.uint32).max
+
+
+        nonce = nonceInt % maxUint32
+        accountId = int(accountId, 10) % maxUint32
+
+        if not self.configV3:
+            raise Exception(
+                'No config provided' +
+                'please call configs_v3()'
+            )
+
+        currency = {}
+
+        for k, v in enumerate(self.configV3.get('contractConfig').get('assets')):
+            if v.get('token') == asset:
+                currency = v
+
+        tokenId = tokenId or currency.get('tokenId')
+
+        amountStr = (decimal.Decimal(amount) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+
+        builder = sdk.TransferBuilder(
+            int(accountId),  receiverAddress, int(subAccountId), int(receiverSubAccountId),  int(tokenId), amountStr.__str__(), '0', int(nonce),  int(timestampSeconds)
+        )
+
+        tx = sdk.Transfer(builder)
+        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
+
+        auth_data = signerSeed.sign_musig(tx.get_bytes())
+        signature = auth_data.signature
+
+        transferData = {
+            'amount': amount,
+            'expireTime': timestampSeconds,
+            'clientTransferId': clientId,
+            'signature': signature,
+            'token': asset,
+            'receiverAccountId': receiverAccountId,
+            'receiverL2Key': receiverL2Key,
+        }
+
+        path = URL_SUFFIX + "/v3/contract-transfer-to"
         return self._post(
             endpoint=path,
             data=transferData
