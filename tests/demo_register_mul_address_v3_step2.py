@@ -3,6 +3,8 @@ import sys
 import time
 from threading import Timer
 
+from apexpro.http_private_v3 import HttpPrivate_v3
+
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
@@ -21,7 +23,7 @@ l2Key = 'your l2Key seeds from register'
 pubKeyHash = 'your l2Key seeds from pubKeyHash'
 
 
-client = HttpPrivate(APEX_HTTP_TEST, network_id=NETWORKID_TEST, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
+client = HttpPrivate_v3(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
 configs = client.configs_v3()
 
 accountRes = client.get_account_v3()
