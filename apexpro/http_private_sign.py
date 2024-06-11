@@ -167,10 +167,25 @@ class HttpPrivateSign(HttpPrivate_v3):
                 slTriggerPriceType = triggerPriceType
                 slExpiration = timestampSeconds
                 slClientId = slClientId or random_client_id()
-                slOrder_to_sign = SignableOrder(
 
+                slMessage = hashlib.sha256()
+                slMessage.update(slClientId.encode())  # Encode as UTF-8.
+                slNonceHash = slMessage.hexdigest()
+                slNonceInt = int(slNonceHash, 16)
+
+                slSlotId = (slNonceInt % maxUint64)/maxUint32
+                slNonce = slNonceInt % maxUint32
+
+                slPriceStr = (decimal.Decimal(slPrice) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+                slSizeStr = (decimal.Decimal(slSize) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+
+                slBuilder = sdk.ContractBuilder(
+                    int(accountId),  int(subAccountId), int(slSlotId), int(slNonce),  int(symbolData.get('l2PairId')), slSizeStr.__str__(), slPriceStr.__str__(), slSide == "BUY",  int(takerFeeRateStr), int(makerFeeRateStr),  False
                 )
-                slSignature = slOrder_to_sign.sign(self.stark_private_key)
+
+                slTx = sdk.Contract(slBuilder)
+                sl_auth_data = signerSeed.sign_musig(slTx.get_bytes())
+                slSignature = sl_auth_data.signature
 
                 if slSide == ORDER_SIDE_BUY:
                     slHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
@@ -193,10 +208,25 @@ class HttpPrivateSign(HttpPrivate_v3):
                 tpTriggerPriceType = triggerPriceType
                 tpExpiration = timestampSeconds
                 tpClientId = tpClientId or random_client_id()
-                tpOrder_to_sign = SignableOrder(
 
+                tpMessage = hashlib.sha256()
+                tpMessage.update(tpClientId.encode())  # Encode as UTF-8.
+                tpNonceHash = tpMessage.hexdigest()
+                tpNonceInt = int(tpNonceHash, 16)
+
+                tpSlotId = (tpNonceInt % maxUint64)/maxUint32
+                tpNonce = tpNonceInt % maxUint32
+
+                tpPriceStr = (decimal.Decimal(tpPrice) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+                tpSizeStr = (decimal.Decimal(tpSize) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+
+                tpBuilder = sdk.ContractBuilder(
+                    int(accountId),  int(subAccountId), int(tpSlotId), int(tpNonce),  int(symbolData.get('l2PairId')), tpSizeStr.__str__(), tpPriceStr.__str__(), tpSide == "BUY",  int(takerFeeRateStr), int(makerFeeRateStr),  False
                 )
-                tpSignature = tpOrder_to_sign.sign(self.stark_private_key)
+
+                tpTx = sdk.Contract(tpBuilder)
+                tp_auth_data = signerSeed.sign_musig(tpTx.get_bytes())
+                tpSignature = tp_auth_data.signature
 
                 if tpSide == ORDER_SIDE_BUY:
                     tpHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
