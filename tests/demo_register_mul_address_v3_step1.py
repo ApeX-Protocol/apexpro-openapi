@@ -1,7 +1,6 @@
 import os
 import sys
 import time
-from threading import Timer
 
 from apexpro.http_private_v3 import HttpPrivate_v3
 
@@ -9,9 +8,7 @@ root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.http_private import HttpPrivate
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN, APEX_OMNI_HTTP_TEST, \
-    APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB
+from apexpro.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB
 
 print("Hello, Apexpro")
 priKey = "your eth private key"
