@@ -4,7 +4,7 @@ APEX_HTTP_TEST = 'https://testnet.pro.apex.exchange'
 APEX_WS_MAIN = 'wss://quote.pro.apex.exchange'
 APEX_WS_TEST = 'wss://quote-qa.pro.apex.exchange'
 
-APEX_OMNI_HTTP_MAIN = 'https://pro.omni.apex.exchange'
+APEX_OMNI_HTTP_MAIN = 'https://pro.apex.exchange'
 APEX_OMNI_HTTP_TEST = 'https://qa.omni.apex.exchange'
 
 URL_SUFFIX = "/api"
@@ -16,6 +16,10 @@ REGISTER_ENVID_TEST = 5
 # ------------ network_id ------------
 NETWORKID_MAIN = 1
 NETWORKID_TEST = 11155111
+
+NETWORKID_OMNI_MAIN_ARB = 9
+NETWORKID_OMNI_TEST_BNB = 3
+NETWORKID_OMNI_TEST_BASE = 11
 
 # ------------ Signature Types ------------
 SIGNATURE_TYPE_NO_PREPEND = 0

@@ -557,9 +557,10 @@ class HttpPrivate_v3(HttpPrivate):
                           zkAccountId,
                           seeds,
                           newPkHash,
-                          feeToken,
                           nonce,
                           l2Key,
+                          feeToken=None,
+                          asset='USDT',
                           subAccountId='0',
                           fee='0',
                           ethPrivateKey = None,
@@ -574,6 +575,8 @@ class HttpPrivate_v3(HttpPrivate):
         #signer1 = sdk.ZkLinkSigner().new_from_hex_eth_signer(ethPrivateKey)
         #pubKey = signer1.public_key()
         #newPkHash = sdk.get_public_key_hash(pubKey)
+
+        feeToken = feeToken or self.configV3.get('spotConfig').get('global').get('defaultChangePubKeyFeeTokenId')
 
         builder = sdk.ChangePubKeyBuilder(chainId, int(zkAccountId), int(subAccountId), newPkHash, int(feeToken), fee, int(nonce), ethSignature, int(times))
         tx = sdk.ChangePubKey(builder)

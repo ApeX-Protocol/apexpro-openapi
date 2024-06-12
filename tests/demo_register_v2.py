@@ -9,7 +9,7 @@ from apexpro.http_private import HttpPrivate
 from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
 
 print("Hello, Apexpro")
-priKey = "xxxx"
+priKey = "your eth private key"
 
 client = HttpPrivate(APEX_HTTP_TEST, network_id=NETWORKID_TEST, eth_private_key=priKey)
 configs = client.configs_v2()

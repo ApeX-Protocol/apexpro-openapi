@@ -10,17 +10,18 @@ root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
 from apexpro.http_private import HttpPrivate
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN, APEX_OMNI_HTTP_TEST
+from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN, APEX_OMNI_HTTP_TEST, \
+    APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB
 
 print("Hello, Apexpro")
 priKey = "your eth private key"
 
-client = HttpPrivate_v3(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST, eth_private_key=priKey)
+client = HttpPrivate_v3(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB, eth_private_key=priKey)
 configs = client.configs_v3()
 
 zkKeys = client.derive_zk_key(client.default_address)
 
-nonceRes = client.generate_nonce_v3(refresh="false", l2Key=zkKeys['l2Key'],ethAddress=client.default_address, chainId=NETWORKID_TEST)
+nonceRes = client.generate_nonce_v3(refresh="false", l2Key=zkKeys['l2Key'],ethAddress=client.default_address, chainId=NETWORKID_OMNI_MAIN_ARB)
 
 regRes = client.register_user_v3(nonce=nonceRes['data']['nonce'],l2Key=zkKeys['l2Key'], seeds=zkKeys['seeds'],ethereum_address=client.default_address,
                                  eth_mul_address="your mul eth address", isLpAccount=True)
@@ -44,9 +45,6 @@ print(zkKeys)
 print(regRes['data']['account']['id'])
 print(regRes['data']['apiKey'])
 
-changeRes = client.change_pub_key_v3(chainId=11, seeds=zkKeys.get('seeds'), zkAccountId = accountRes.get('spotAccount').get('zkAccountId'), subAccountId = accountRes.get('spotAccount').get('defaultSubAccountId'),
-                                     newPkHash = zkKeys.get('pubKeyHash'), feeToken="140", fee="0", nonce= accountRes.get('spotAccount').get('nonce'), l2Key= zkKeys.get('l2Key'), ethSignatureType='Onchain')
-print(changeRes)
 print("end, Apexpro")
 
 
