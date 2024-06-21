@@ -122,3 +122,81 @@ class HttpPublic(HTTP):
             path=self.endpoint + suffix,
             query=kwargs
         )
+
+    def depth_v3(self, **kwargs):
+        """"
+        GET Retrieve Market Depth.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#publicapi-get-retrieve-market-depth
+        :returns: Request results as dictionary.
+        """
+        suffix = URL_SUFFIX + "/v3/depth"
+        if kwargs.get('symbol') is not None:
+            kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )
+
+    def trades_v3(self, **kwargs):
+        """"
+        GET Retrieve Newest Trading Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#publicapi-get-retrieve-newest-trading-data
+        :returns: Request results as dictionary.
+        """
+        suffix = URL_SUFFIX + "/v3/trades"
+        if kwargs.get('symbol') is not None:
+            kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )
+
+    def klines_v3(self, **kwargs):
+        """"
+        GET Retrieve Candlestick Chart Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#publicapi-get-retrieve-candlestick-chart-data
+        :returns: Request results as dictionary.
+        """
+        suffix = URL_SUFFIX + "/v3/klines"
+        if kwargs.get('symbol') is not None:
+            kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )
+
+    def ticker_v3(self, **kwargs):
+        """"
+        GET Retrieve Ticker Data.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#publicapi-get-retrieve-ticker-data
+        :returns: Request results as dictionary.
+        """
+        suffix = URL_SUFFIX + "/v3/ticker"
+        if kwargs.get('symbol') is not None:
+            kwargs['symbol'] = kwargs['symbol'].replace('-', '')
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )
+
+    def history_funding_v3(self, **kwargs):
+        """"
+        GET Retrieve Funding Rate History.
+        :param kwargs: See
+        https://api-docs.pro.apex.exchange/#publicapi-get-retrieve-funding-rate-history
+        :returns: Request results as dictionary.
+        """
+        suffix = URL_SUFFIX + "/v3/history-funding"
+        return self._submit_request(
+            method='GET',
+            path=self.endpoint + suffix,
+            query=kwargs
+        )

@@ -156,7 +156,7 @@ class _WebSocketManager:
 
         req = {
             'type': 'login',
-            'topics': ['ws_notify_v1', 'ws_accounts_v2', 'ws_accounts_v1'],
+            'topics': ['ws_notify_v1', 'ws_accounts_v2', 'ws_zk_accounts_v3','ws_accounts_v1'],
             'httpMethod': 'GET',
             'requestPath': PRIVATE_REQUEST_PATH,
             'apiKey': self.api_key_credentials['key'],

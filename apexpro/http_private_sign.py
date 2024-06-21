@@ -8,7 +8,7 @@ import zklink_sdk as sdk
 from apexpro.constants import URL_SUFFIX, ORDER_SIDE_BUY
 from apexpro.helpers.request_helpers import random_client_id
 from apexpro.http_private_v3 import HttpPrivate_v3
-from apexpro.starkex.order import SignableOrder, DECIMAL_CONTEXT_ROUND_UP, DECIMAL_CONTEXT_ROUND_DOWN
+from apexpro.starkex.order import DECIMAL_CONTEXT_ROUND_UP, DECIMAL_CONTEXT_ROUND_DOWN
 
 
 class HttpPrivateSign(HttpPrivate_v3):

@@ -4,8 +4,11 @@ APEX_HTTP_TEST = 'https://testnet.pro.apex.exchange'
 APEX_WS_MAIN = 'wss://quote.pro.apex.exchange'
 APEX_WS_TEST = 'wss://quote-qa.pro.apex.exchange'
 
-APEX_OMNI_HTTP_MAIN = 'https://pro.apex.exchange'
+APEX_OMNI_HTTP_MAIN = 'https://omni.apex.exchange'
 APEX_OMNI_HTTP_TEST = 'https://qa.omni.apex.exchange'
+
+APEX_OMNI_WS_MAIN = 'wss://quote.omni.apex.exchange'
+APEX_OMNI_WS_TEST = 'wss://qa-quote.omni.apex.exchange'
 
 URL_SUFFIX = "/api"
 

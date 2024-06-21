@@ -12,8 +12,8 @@ from apexpro.http_public import HttpPublic
 print("Hello, Apexpro")
 
 client = HttpPublic(APEX_HTTP_MAIN)
-print(client.history_funding(symbol="BTC-USDC"))
-print(client.klines(symbol="ETHUSDC",interval=5,start=1681463600, end=1681563600, limit=5))
+#print(client.history_funding(symbol="BTC-USDC"))
+print(client.klines(symbol="BTCUSDC",interval=60,start=1718683200, end=1718683200, limit=1))
 print(client.server_time())
 print(client.configs())
 print(client.depth(symbol="BTC-USDC"))

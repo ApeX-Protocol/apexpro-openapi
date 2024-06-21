@@ -7,19 +7,17 @@ root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.http_private import HttpPrivate
-
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_OMNI_HTTP_TEST
+from apexpro.constants import APEX_OMNI_HTTP_MAIN, \
+    NETWORKID_OMNI_MAIN_ARB
 
 print("Hello, Apexpro")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
 
-key = 'your apiKey-key from register'
-secret = 'your apiKey-secret from register'
-passphrase = 'your apiKey-passphrase from register'
+key = 'your apiKey-key from register V3'
+secret = 'your apiKey-secret from register  V3'
+passphrase = 'your apiKey-passphrase from register  V3'
 
-
-client = HttpPrivate_v3(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
+client = HttpPrivate_v3(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
 configs = client.configs_v3()
 
 userRes = client.get_user_v3()
@@ -28,6 +26,9 @@ print(userRes)
 
 accountRes = client.get_account_v3()
 print(accountRes)
+
+accountBalanceRes = client.get_account_balance_v3()
+print(accountBalanceRes)
 
 fillsRes = client.fills_v3(limit=100,page=0,symbol="BTC-USDT",side="BUY",token="USDT")
 print(fillsRes)
