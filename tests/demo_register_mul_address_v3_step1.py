@@ -10,7 +10,7 @@ sys.path.append(root_path)
 
 from apexpro.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB
 
-print("Hello, Apexpro")
+print("Hello, Apex Omni")
 priKey = "your eth private key"
 
 client = HttpPrivate_v3(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB, eth_private_key=priKey)

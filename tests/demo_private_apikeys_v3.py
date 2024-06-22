@@ -9,12 +9,12 @@ sys.path.append(root_path)
 
 from apexpro.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
 
-print("Hello, Apexpro")
+print("Hello, Apex Omni")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
 
-key = 'your apiKey-key from register'
-secret = 'your apiKey-secret from register'
-passphrase = 'your apiKey-passphrase from register'
+key = 'your apiKey-key from register V3'
+secret = 'your apiKey-secret from register  V3'
+passphrase = 'your apiKey-passphrase from register  V3'
 
 seeds = 'your zk seeds from register'
 l2Key = 'your l2Key seeds from register'

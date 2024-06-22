@@ -10,7 +10,7 @@ sys.path.append(root_path)
 from apexpro.constants import APEX_OMNI_HTTP_MAIN, \
     NETWORKID_OMNI_MAIN_ARB
 
-print("Hello, Apexpro")
+print("Hello, Apex Omni")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
 
 key = 'your apiKey-key from register V3'

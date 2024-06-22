@@ -13,7 +13,7 @@ from apexpro.http_private import HttpPrivate
 from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN, APEX_OMNI_HTTP_TEST, \
     APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB
 
-print("Hello, Apexpro")
+print("Hello, Apex Omni")
 
 key = 'your apiKey-key from register'
 secret = 'your apiKey-secret from register'
