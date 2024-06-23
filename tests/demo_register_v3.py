@@ -18,31 +18,31 @@ configs = client.configs_v3()
 
 zkKeys = client.derive_zk_key(client.default_address)
 print(zkKeys)
+print(zkKeys['seeds'])
+print(zkKeys['l2Key'])
+print(zkKeys['pubKeyHash'])
 
 nonceRes = client.generate_nonce_v3(refresh="false", l2Key=zkKeys['l2Key'],ethAddress=client.default_address, chainId=NETWORKID_OMNI_MAIN_ARB)
 
 regRes = client.register_user_v3(nonce=nonceRes['data']['nonce'],l2Key=zkKeys['l2Key'], seeds=zkKeys['seeds'],ethereum_address=client.default_address)
 
+print(regRes['data']['apiKey']['key'])
+print(regRes['data']['apiKey']['secret'])
+print(regRes['data']['apiKey']['passphrase'])
 
-key = regRes['data']['apiKey']['key']
-secret = regRes['data']['apiKey']['secret']
-passphrase = regRes['data']['apiKey']['passphrase']
-
-time.sleep(5)
+time.sleep(10)
 accountRes = client.get_account_v3()
 print(accountRes)
 
+#back zkKeys, apiKey,and accountId for private Api or create-order transfer or withdraw
 
-#back stark_key_pair, apiKey,and accountId for private Api or create-oreder or withdraw
-
-print(regRes['data']['account']['id'])
 print(regRes['data']['apiKey'])
 
 changeRes = client.change_pub_key_v3(chainId=NETWORKID_OMNI_MAIN_ARB, seeds=zkKeys.get('seeds'), ethPrivateKey=priKey, zkAccountId = accountRes.get('spotAccount').get('zkAccountId'), subAccountId = accountRes.get('spotAccount').get('defaultSubAccountId'),
                                      newPkHash = zkKeys.get('pubKeyHash'),  nonce= accountRes.get('spotAccount').get('nonce'), l2Key= zkKeys.get('l2Key'))
 print(changeRes)
 
-time.sleep(5)
+time.sleep(10)
 accountRes = client.get_account_v3()
 print(accountRes)
 print("end, Apexpro")
