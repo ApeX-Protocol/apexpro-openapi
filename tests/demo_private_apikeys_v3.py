@@ -43,7 +43,7 @@ print(generateRes)
 allApikeys = client.all_apikeys_v3()
 print(allApikeys)
 
-print("end, Apexpro")
+print("end, Apex Omni")
 
 
 

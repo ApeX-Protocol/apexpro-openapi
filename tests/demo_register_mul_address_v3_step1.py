@@ -42,7 +42,7 @@ print(zkKeys)
 print(regRes['data']['account']['id'])
 print(regRes['data']['apiKey'])
 
-print("end, Apexpro")
+print("end, Apex Omni")
 
 
 

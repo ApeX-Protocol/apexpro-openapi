@@ -68,6 +68,6 @@ createOrderRes = client.create_order_v3(symbol="BTC-USDT", side="BUY",
 print(createOrderRes)
 
 
-print("end, Apexpro")
+print("end, Apex Omni")
 
 

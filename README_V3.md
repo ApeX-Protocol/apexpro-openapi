@@ -12,6 +12,12 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 If the user's computer using  arm chip,  change libzklink_sdk-arm.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/   
 If the user's computer using  x86 chip,  change libzklink_sdk-x86.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/     
 
+## Installation
+`apex omni` requires Python 3.6.1 - Python 3.9.x . The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
+```
+pip3 install apexomni-arm
+pip3 install apexomni-x86
+```
 ## New Basic Usage V3 
 You can create an HTTP session for Inverse on APEX_OMNI_HTTP_TEST or APEX_OMNI_HTTP_MAIN:
 ```python

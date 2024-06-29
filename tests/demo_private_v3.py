@@ -82,7 +82,7 @@ setInitialMarginRateRes = client.set_initial_margin_rate_v3(symbol="BTC-USDT",in
 print(setInitialMarginRateRes)
 
 
-print("end, Apexpro")
+print("end, Apex Omni")
 
 
 

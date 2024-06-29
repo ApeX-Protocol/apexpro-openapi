@@ -37,5 +37,5 @@ print(changeRes)
 time.sleep(10)
 accountRes = client.get_account_v3()
 print(accountRes)
-print("end, Apexpro")
+print("end, Apex Omni")
 

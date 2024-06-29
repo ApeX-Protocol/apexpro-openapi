@@ -11,7 +11,7 @@ Put simply, `apexpro`  is the official lightweight one-stop-shop module for the 
 `apexpro` is being actively developed, and new API changes should arrive on `apexpro` very quickly. `apexpro` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.
 
 ## Installation
-`apexpro` requires Python 3.6.1 - Python 3.10.0 . The module can be installed manually or via [apexpro](https://pypi.org/project/apexpro/) with `pip`:
+`apexpro` requires Python 3.6.1 - Python 3.9.x . The module can be installed manually or via [apexpro](https://pypi.org/project/apexpro/) with `pip`:
 ```
 pip3 install apexpro
 ```
