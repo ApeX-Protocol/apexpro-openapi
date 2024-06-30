@@ -8,9 +8,10 @@ You can get Api information from
 Put simply, `apex omni` is the official lightweight one-stop-shop module for the Apex omni HTTP and WebSocket APIs. 
 
 ## Development
-`apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.    
-If the user's computer using  arm chip,  change libzklink_sdk-arm.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/   
-If the user's computer using  x86 chip,  change libzklink_sdk-x86.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/     
+- `apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.      
+- If the user's computer using  arm chip,  change libzklink_sdk-arm.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/   
+- If the user's computer using  x86 chip,  change libzklink_sdk-x86.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/     
+- If the user's computer OS is windows,  copy zklink_sdk.dll in the directory  ./apexpro/ and ./test/
 
 ## Installation
 `apex omni` requires Python 3.6.1 - Python 3.9.x . The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
