@@ -679,3 +679,10 @@ class HttpPrivate_v3(HttpPrivate):
                 'remark':remark,
             }
         )
+
+    def withdraws_by_time_and_status_v3(self, **kwargs):
+        path = URL_SUFFIX + "/v3/withdraws-by-time-and-status"
+        return self._get(
+            endpoint=path,
+            params=kwargs
+        )

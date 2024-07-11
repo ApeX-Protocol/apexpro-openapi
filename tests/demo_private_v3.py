@@ -1,5 +1,6 @@
 import os
 import sys
+import time
 
 from apexpro.http_private_v3 import HttpPrivate_v3
 
@@ -8,21 +9,24 @@ root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
 from apexpro.constants import APEX_OMNI_HTTP_MAIN, \
-    NETWORKID_OMNI_MAIN_ARB
+    NETWORKID_OMNI_MAIN_ARB, APEX_OMNI_HTTP_TEST, NETWORKID_TEST
 
 print("Hello, Apex Omni")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
 
-key = 'your apiKey-key from register V3'
-secret = 'your apiKey-secret from register  V3'
-passphrase = 'your apiKey-passphrase from register  V3'
+key = 'your apiKey-key from register'
+secret = 'your apiKey-secret from register'
+passphrase = 'your apiKey-passphrase from register'
 
-client = HttpPrivate_v3(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
+client = HttpPrivate_v3(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
 configs = client.configs_v3()
 
 userRes = client.get_user_v3()
 print(userRes)
 
+currentTime = time.time() - 100000
+withdrawRes = client.withdraws_by_time_and_status_v3(startTime=int(currentTime), status='success')
+print(withdrawRes)
 
 accountRes = client.get_account_v3()
 print(accountRes)
