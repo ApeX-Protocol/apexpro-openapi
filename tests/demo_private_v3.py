@@ -24,7 +24,7 @@ configs = client.configs_v3()
 userRes = client.get_user_v3()
 print(userRes)
 
-currentTime = time.time() - 100000
+currentTime = time.time()*1000
 withdrawRes = client.withdraws_by_time_and_status_v3(startTime=int(currentTime), status='success')
 print(withdrawRes)
 
