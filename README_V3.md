@@ -18,7 +18,8 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 `apex omni` requires Python 3.6.1 - Python 3.9.x . The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
 ```
 pip3 install apexomni-arm
-pip3 install apexomni-x86
+pip3 install apexomni-x86-mac
+pip3 install apexomni-x86-windows-linux
 ```
 ## New Basic Usage V3 
 You can create an HTTP session for Inverse on APEX_OMNI_HTTP_TEST or APEX_OMNI_HTTP_MAIN:
