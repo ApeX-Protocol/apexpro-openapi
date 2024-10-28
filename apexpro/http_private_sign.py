@@ -476,6 +476,86 @@ class HttpPrivateSign(HttpPrivate_v3):
             data=transferData
         )
 
+    def create_transfer_out_to_address_v3(self,
+                               amount,
+                               asset,
+                               nonce=None,
+                               tokenId=None,
+                               zkAccountId=None,
+                               subAccountId=None,
+                               fee='0',
+                               clientId=None,
+                               timestampSeconds=None,
+                               receiverAccountId=None,
+                               receiverZkAccountId=None,
+                               receiverSubAccountId=None,
+                               receiverAddress=None,
+                               signature=None, ):
+
+        clientId = clientId or random_client_id()
+        if not self.zk_seeds:
+            raise Exception(
+                'No signature provided and client was not ' +
+                'initialized with zk_seeds'
+            )
+
+        timestampSeconds =  int(timestampSeconds or int(time.time()))
+        zkAccountId = zkAccountId or self.accountV3.get('spotAccount').get('zkAccountId')
+        subAccountId = subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
+        nonce = nonce or self.accountV3.get('spotAccount').get('subAccounts')[0].get('nonce')
+
+        receiverSubAccountId = receiverSubAccountId or 0
+
+        if not self.configV3:
+            raise Exception(
+                'No config provided' +
+                'please call configs_v3()'
+            )
+
+        currency = {}
+
+        for k, v in enumerate(self.configV3.get('spotConfig').get('assets')):
+            if v.get('token') == asset:
+                currency = v
+
+        tokenId = tokenId or currency.get('tokenId')
+
+        amountStr = (decimal.Decimal(amount) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+
+        builder = sdk.TransferBuilder(
+            int(zkAccountId),  receiverAddress, int(subAccountId), int(receiverSubAccountId), int(tokenId), amountStr.__str__(), '0', int(nonce),  int(timestampSeconds)
+        )
+
+        tx = sdk.Transfer(builder)
+        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
+
+        auth_data = signerSeed.sign_musig(tx.get_bytes())
+        signature = auth_data.signature
+
+        transferData = {
+            'amount': amount,
+            'timestamp': int(timestampSeconds),
+            'clientTransferId': clientId,
+            'signature': signature,
+            'zkAccountId': zkAccountId,
+            'subAccountId': subAccountId,
+            'fee': str(fee),
+            'token': asset,
+            'tokenId': tokenId,
+            'receiverAccountId': receiverAccountId,
+            'receiverZkAccountId': receiverZkAccountId,
+            'receiverSubAccountId': receiverSubAccountId,
+            'receiverAddress': receiverAddress,
+            'nonce': nonce,
+        }
+
+        path = URL_SUFFIX + "/v3/transfer-out-to-address"
+        return self._post(
+            endpoint=path,
+            data=transferData
+        )
+
     def create_contract_transfer_out_v3(self,
                                         amount,
                                         asset,
