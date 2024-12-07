@@ -721,3 +721,53 @@ class HttpPrivateSign(HttpPrivate_v3):
             endpoint=path,
             data=transferData
         )
+
+    def create_manual_repayment_v3(self,
+                                   repaymentTokens,
+                                   poolRepaymentTokens,
+                                   clientId=None,
+                                   timestampSeconds=None,
+                                   accountId=None,
+                                   signature=None, ):
+
+        clientId = clientId or random_client_id()
+        if not self.zk_seeds:
+            raise Exception(
+                'No signature provided and client was not ' +
+                'initialized with zk_seeds'
+            )
+
+        timestampSeconds =  timestampSeconds or int(time.time())
+        timestampSeconds = int(timestampSeconds + 3600 * 24 * 28)
+        accountId = accountId or self.accountV3.get('id')
+
+        msgHashString ="accountId=" + accountId + "&clientId=" + clientId + "&expireTime=" + str(timestampSeconds) + "&repaymentTokens=" + repaymentTokens
+
+        message = hashlib.sha256()
+        message.update(msgHashString.encode())  # Encode as UTF-8.
+        msgHash = message.digest()
+
+        EC_ORDER = '3618502788666131213697322783095070105526743751716087489154079457884512865583';
+
+        bn1 = int(msgHash.hex(), 16)
+        bn2 = int (EC_ORDER, 10)
+        signMsg = hex(bn1.__mod__(bn2))
+
+        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
+        signatureData = signerSeed.sign_musig(signMsg.removeprefix('0x').encode())
+        signature = signatureData.signature
+
+        repaymentData = {
+            'repaymentTokens': repaymentTokens,
+            'expireTime': timestampSeconds,
+            'clientId': clientId,
+            'signature': signature,
+            'poolRepaymentTokens': poolRepaymentTokens,
+        }
+
+        path = URL_SUFFIX + "/v3/manual-create-repayment"
+        return self._post(
+            endpoint=path,
+            data=repaymentData
+        )

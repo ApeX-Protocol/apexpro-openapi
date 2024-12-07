@@ -38,14 +38,14 @@ print(client.get_account_balance_v2())
 
 currentTime = time.time()
 
-#feeRes = client.uncommon_withdraw_fee_v2(amount='2',chainId='5', token='USDT',)
-#print(feeRes)
-#fastWithdrawRes = client.fast_withdrawal_v2(amount='2',expirationEpochSeconds= currentTime,asset='USDT',fee=feeRes['data']['fee'])
+feeRes = client.uncommon_withdraw_fee_v2(amount='2',chainId='1', token='USDC',)
+print(feeRes)
+fastWithdrawRes = client.fast_withdrawal_v2(amount='2',expirationEpochSeconds= currentTime,asset='USDC',fee=feeRes['data']['fee'])
 
-#createWithdrawRes = client.create_withdrawal_v2(amount='1',expirationEpochSeconds= currentTime,asset='USDT')
-#print(createWithdrawRes)
+createWithdrawRes = client.create_withdrawal_v2(amount='1',expirationEpochSeconds= currentTime,asset='USDC')
+print(createWithdrawRes)
 
-historyOrdersRes = client.history_orders_v2(token="USDT")
+historyOrdersRes = client.history_orders_v2(token="USDC")
 print(historyOrdersRes)
 
 orderFills = client.order_fills_v2(orderId='498441108374684453')
@@ -53,35 +53,35 @@ print(orderFills)
 
 limitFeeRate = '0.0005'
 
-deleteOrdersRes = client.delete_open_orders_v2(token="USDT")
+deleteOrdersRes = client.delete_open_orders_v2(token="USDC")
 print(deleteOrdersRes)
-createOrderRes = client.create_order_v2(symbol="BTC-USDT", side="SELL",
+createOrderRes = client.create_order_v2(symbol="BTC-USDC", side="SELL",
                                            type="LIMIT", size="0.01",expirationEpochSeconds= currentTime,
                                            price="36890", limitFeeRate=limitFeeRate)
 
 
 #print(createOrderRes)
 
-fillsRes = client.fills_v2(limit=100,page=0,symbol="BTC-USDT",token="USDT")
+fillsRes = client.fills_v2(limit=100,page=0,symbol="BTC-USDC",token="USDC")
 print(fillsRes)
 
 
-openOrderRes = client.open_orders_v2(token='USDT')
+openOrderRes = client.open_orders_v2(token='USDC')
 print(openOrderRes)
 
 
-deleteOrdersRes = client.delete_open_orders_v2(token="USDT")
+deleteOrdersRes = client.delete_open_orders_v2(token="USDC")
 print(deleteOrdersRes)
 
-historyOrdersRes = client.history_orders_v2(token="USDT")
+historyOrdersRes = client.history_orders_v2(token="USDC")
 print(historyOrdersRes)
 
-openOrderRes = client.open_orders_v2(token='USDT')
+openOrderRes = client.open_orders_v2(token='USDC')
 print(openOrderRes)
 
-feeRes = client.uncommon_withdraw_fee_v2(amount='2',chainId='97', token='USDT')
+feeRes = client.uncommon_withdraw_fee_v2(amount='2',chainId='97', token='USDC')
 print(feeRes)
-crossWithdrawRes = client.cross_chain_withdraw_v2(amount='2',expirationEpochSeconds= currentTime,asset='USDT',fee=feeRes['data']['fee'],chainId='97')
+crossWithdrawRes = client.cross_chain_withdraw_v2(amount='2',expirationEpochSeconds= currentTime,asset='USDC',fee=feeRes['data']['fee'],chainId='97')
 print(crossWithdrawRes)
 
 print("end, Apexpro")

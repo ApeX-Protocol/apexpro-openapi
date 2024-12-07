@@ -1,9 +1,11 @@
 import hashlib
 import json
 import time
+import urllib
 
 import zklink_sdk as sdk
 from apexpro.constants import URL_SUFFIX, APEX_OMNI_HTTP_TEST
+from apexpro.helpers.request_helpers import random_client_id
 from apexpro.http_private import HttpPrivate
 
 
@@ -85,7 +87,7 @@ class HttpPrivate_v3(HttpPrivate):
 
         apiKeyHash = hex(bn1).removeprefix('0x') + '|' + signMsg.removeprefix('0x')
 
-        path = URL_SUFFIX + "/v3/onboarding"
+        path = URL_SUFFIX + "/v3/new-onboarding"
         onboardingRes = self._private_request(
             method="POST",
             path=path,
@@ -615,6 +617,20 @@ class HttpPrivate_v3(HttpPrivate):
         return self._get(
             endpoint=path,
             params=kwargs
+        )
+
+    def get_repayment_price_v3(self, repaymentPriceTokens, clientId=None ):
+
+        repaymentPriceTokens = urllib.parse.quote(repaymentPriceTokens)
+
+        clientId = clientId or random_client_id()
+        path = URL_SUFFIX + "/v3/repayment-price"
+        return self._get(
+            endpoint=path,
+            params={
+                'repaymentPriceTokens':repaymentPriceTokens,
+                'clientId': clientId
+            }
         )
 
     def apikey_bind_ip_v3(self, **kwargs):
