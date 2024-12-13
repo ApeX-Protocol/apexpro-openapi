@@ -44,7 +44,7 @@ setup(
         'pytest>=4.4.0,<5.0.0',
         'requests-mock==1.6.0',
         'requests>=2.22.0,<3.0.0',
-        'setuptools==50.3.2',
+        'setuptools>=50.3.2',
         'sympy==1.6',
         'tox==3.13.2',
         'web3>=5.0.0,<6.0.0'
