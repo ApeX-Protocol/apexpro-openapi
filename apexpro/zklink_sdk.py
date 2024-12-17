@@ -504,11 +504,19 @@ def _uniffi_check_contract_api_version(lib):
         raise InternalError("UniFFI contract version mismatch: try cleaning and rebuilding your project")
 
 def _uniffi_check_api_checksums(lib):
+    if lib.uniffi_zklink_sdk_checksum_func_closest_packable_fee_amount() != 18129:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_zklink_sdk_checksum_func_closest_packable_token_amount() != 61679:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_zklink_sdk_checksum_func_create_signed_change_pubkey() != 63374:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_zklink_sdk_checksum_func_eth_signature_of_change_pubkey() != 32759:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_zklink_sdk_checksum_func_get_public_key_hash() != 58294:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_zklink_sdk_checksum_func_is_fee_amount_packable() != 11137:
+        raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
+    if lib.uniffi_zklink_sdk_checksum_func_is_token_amount_packable() != 50233:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
     if lib.uniffi_zklink_sdk_checksum_func_verify_musig() != 61749:
         raise InternalError("UniFFI API checksum mismatch: try cleaning and rebuilding your project")
@@ -1665,6 +1673,16 @@ _UniffiLib.uniffi_zklink_sdk_fn_method_zklinksigner_sign_musig.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_zklink_sdk_fn_method_zklinksigner_sign_musig.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_zklink_sdk_fn_func_closest_packable_fee_amount.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_zklink_sdk_fn_func_closest_packable_fee_amount.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_zklink_sdk_fn_func_closest_packable_token_amount.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_zklink_sdk_fn_func_closest_packable_token_amount.restype = _UniffiRustBuffer
 _UniffiLib.uniffi_zklink_sdk_fn_func_create_signed_change_pubkey.argtypes = (
     ctypes.c_void_p,
     ctypes.c_void_p,
@@ -1683,6 +1701,16 @@ _UniffiLib.uniffi_zklink_sdk_fn_func_get_public_key_hash.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.uniffi_zklink_sdk_fn_func_get_public_key_hash.restype = _UniffiRustBuffer
+_UniffiLib.uniffi_zklink_sdk_fn_func_is_fee_amount_packable.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_zklink_sdk_fn_func_is_fee_amount_packable.restype = ctypes.c_int8
+_UniffiLib.uniffi_zklink_sdk_fn_func_is_token_amount_packable.argtypes = (
+    _UniffiRustBuffer,
+    ctypes.POINTER(_UniffiRustCallStatus),
+)
+_UniffiLib.uniffi_zklink_sdk_fn_func_is_token_amount_packable.restype = ctypes.c_int8
 _UniffiLib.uniffi_zklink_sdk_fn_func_verify_musig.argtypes = (
     _UniffiRustBuffer,
     _UniffiRustBuffer,
@@ -1956,6 +1984,12 @@ _UniffiLib.ffi_zklink_sdk_rust_future_complete_void.argtypes = (
     ctypes.POINTER(_UniffiRustCallStatus),
 )
 _UniffiLib.ffi_zklink_sdk_rust_future_complete_void.restype = None
+_UniffiLib.uniffi_zklink_sdk_checksum_func_closest_packable_fee_amount.argtypes = (
+)
+_UniffiLib.uniffi_zklink_sdk_checksum_func_closest_packable_fee_amount.restype = ctypes.c_uint16
+_UniffiLib.uniffi_zklink_sdk_checksum_func_closest_packable_token_amount.argtypes = (
+)
+_UniffiLib.uniffi_zklink_sdk_checksum_func_closest_packable_token_amount.restype = ctypes.c_uint16
 _UniffiLib.uniffi_zklink_sdk_checksum_func_create_signed_change_pubkey.argtypes = (
 )
 _UniffiLib.uniffi_zklink_sdk_checksum_func_create_signed_change_pubkey.restype = ctypes.c_uint16
@@ -1965,6 +1999,12 @@ _UniffiLib.uniffi_zklink_sdk_checksum_func_eth_signature_of_change_pubkey.restyp
 _UniffiLib.uniffi_zklink_sdk_checksum_func_get_public_key_hash.argtypes = (
 )
 _UniffiLib.uniffi_zklink_sdk_checksum_func_get_public_key_hash.restype = ctypes.c_uint16
+_UniffiLib.uniffi_zklink_sdk_checksum_func_is_fee_amount_packable.argtypes = (
+)
+_UniffiLib.uniffi_zklink_sdk_checksum_func_is_fee_amount_packable.restype = ctypes.c_uint16
+_UniffiLib.uniffi_zklink_sdk_checksum_func_is_token_amount_packable.argtypes = (
+)
+_UniffiLib.uniffi_zklink_sdk_checksum_func_is_token_amount_packable.restype = ctypes.c_uint16
 _UniffiLib.uniffi_zklink_sdk_checksum_func_verify_musig.argtypes = (
 )
 _UniffiLib.uniffi_zklink_sdk_checksum_func_verify_musig.restype = ctypes.c_uint16
@@ -7883,6 +7923,18 @@ class _UniffiConverterTypeZkLinkTx:
     def lower(value):
         return _UniffiConverterString.lower(value)
 
+def closest_packable_fee_amount(fee: "BigUint") -> "BigUint":
+    
+    return _UniffiConverterTypeBigUint.lift(_rust_call(_UniffiLib.uniffi_zklink_sdk_fn_func_closest_packable_fee_amount,
+        _UniffiConverterTypeBigUint.lower(fee)))
+
+
+def closest_packable_token_amount(amount: "BigUint") -> "BigUint":
+    
+    return _UniffiConverterTypeBigUint.lift(_rust_call(_UniffiLib.uniffi_zklink_sdk_fn_func_closest_packable_token_amount,
+        _UniffiConverterTypeBigUint.lower(amount)))
+
+
 def create_signed_change_pubkey(zklink_signer: "ZkLinkSigner",tx: "ChangePubKey",eth_auth_data: "ChangePubKeyAuthData") -> "ChangePubKey":
     
     
@@ -7905,6 +7957,18 @@ def get_public_key_hash(public_key: "PackedPublicKey") -> "PubKeyHash":
     
     return _UniffiConverterTypePubKeyHash.lift(_rust_call(_UniffiLib.uniffi_zklink_sdk_fn_func_get_public_key_hash,
         _UniffiConverterTypePackedPublicKey.lower(public_key)))
+
+
+def is_fee_amount_packable(fee: "BigUint") -> "bool":
+    
+    return _UniffiConverterBool.lift(_rust_call(_UniffiLib.uniffi_zklink_sdk_fn_func_is_fee_amount_packable,
+        _UniffiConverterTypeBigUint.lower(fee)))
+
+
+def is_token_amount_packable(amount: "BigUint") -> "bool":
+    
+    return _UniffiConverterBool.lift(_rust_call(_UniffiLib.uniffi_zklink_sdk_fn_func_is_token_amount_packable,
+        _UniffiConverterTypeBigUint.lower(amount)))
 
 
 def verify_musig(signature: "ZkLinkSignature",msg: "typing.List[int]") -> "bool":
@@ -7958,9 +8022,13 @@ __all__ = [
     "UpdateGlobalVarBuilder",
     "WithdrawBuilder",
     "ZkLinkSignature",
+    "closest_packable_fee_amount",
+    "closest_packable_token_amount",
     "create_signed_change_pubkey",
     "eth_signature_of_change_pubkey",
     "get_public_key_hash",
+    "is_fee_amount_packable",
+    "is_token_amount_packable",
     "verify_musig",
     "zklink_main_net_url",
     "zklink_test_net_url",
