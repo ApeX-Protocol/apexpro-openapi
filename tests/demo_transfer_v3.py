@@ -42,18 +42,18 @@ accountData = client.get_account_v3()
 #createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=3, fee=withdraw_feeRes.get('data').get('withdrawFeeAndPoolBalances')[0].get('fee'), isFastWithdraw=True)
 #print(createWithdrawRes)
 
-#smple3 transfer_out
+#smple3 transfer_out,  from fund account to contract account
 #createTransferRes = client.create_transfer_out_v3(amount='3.4359738368',asset='USDT')
 #print(createTransferRes)
 
 #createTransferRes = client.create_transfer_out_v3(amount='0.01',asset='ETH')
 #print(createTransferRes)
 
-#smple4 contract transfer_out
+#smple4 contract transfer_out, from contract account to fund account
 #createContractTransferRes = client.create_contract_transfer_out_v3(amount='0.005',asset='ETH')
 #print(createContractTransferRes)
 
-#smple5 contract contract_transfer_to_address
+#smple5 contract contract_transfer_to_address,   from one contract account to another contract account
 #createContractTransferRes = client.create_contract_transfer_to_address_v3(amount='1.1',asset='USDT',receiverAddress='0xfab6256aeef3be7805d3138be8fe1369f716ebc5',receiverAccountId='585750146675900485',receiverL2Key='0x04a234f299958150707451f649208fd085680bf3e1be432acb533eb2cc06082a')
 #print(createContractTransferRes)
 
