@@ -207,7 +207,7 @@ class HttpPrivate(HttpPublic):
             nonce=nonce,
         )
 
-        path = URL_SUFFIX + "/v2/onboarding"
+        path = URL_SUFFIX + "/v2/onboarding-all"
         onboardingRes = self._private_request(
             method="POST",
             path=path,

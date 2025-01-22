@@ -775,7 +775,8 @@ class HttpPrivateStark(HttpPrivate):
             if v1.get('chainId') == self.network_id:
                 for _, v2 in enumerate(v1.get('tokens')):
                     if v2.get('token') == asset:
-                        token = v2
+                        if v2.get('withdrawEnable') == True:
+                            token = v2
 
         fact = get_transfer_erc20_fact(
             recipient=ethAddress,
@@ -892,7 +893,8 @@ class HttpPrivateStark(HttpPrivate):
             if v1.get('chainId') == self.network_id:
                 for _, v2 in enumerate(v1.get('tokens')):
                     if v2.get('token') == asset:
-                        token = v2
+                        if v2.get('withdrawEnable') == True:
+                            token = v2
 
         fact = get_transfer_erc20_fact(
             recipient=ethAddress,
@@ -1001,7 +1003,8 @@ class HttpPrivateStark(HttpPrivate):
             if v1.get('chainId') == int(chainId):
                 for _, v2 in enumerate(v1.get('tokens')):
                     if v2.get('token') == asset:
-                        token = v2
+                        if v2.get('withdrawEnable') == True:
+                            token = v2
 
         totalAmount = decimal.Decimal(amount) + decimal.Decimal(fee)
         transfer_to_sign = SignableTransfer(
@@ -1095,7 +1098,8 @@ class HttpPrivateStark(HttpPrivate):
             if v1.get('chainId') == int(chainId):
                 for _, v2 in enumerate(v1.get('tokens')):
                     if v2.get('token') == asset:
-                        token = v2
+                        if v2.get('withdrawEnable') == True:
+                            token = v2
 
         totalAmount = decimal.Decimal(amount) + decimal.Decimal(fee)
         transfer_to_sign = SignableTransfer(
