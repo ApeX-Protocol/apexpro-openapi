@@ -205,8 +205,9 @@ class HttpPrivate_v3(HttpPrivate):
             endpoint=path,
             params=kwargs
         )
-        self.accountV3 = accountRes.get('data')
-        self.default_address = self.accountV3.get('ethereumAddress')
+        if accountRes.get('data') is not None:
+            self.accountV3 = accountRes.get('data')
+            self.default_address = self.accountV3.get('ethereumAddress')
         return accountRes.get('data')
 
     def transfers_v3(self, **kwargs):
