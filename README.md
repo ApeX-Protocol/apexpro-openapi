@@ -1,4 +1,4 @@
-# apexpro
+# apex omni
 
 Official Python3 API connector for Apex omni's HTTP and WebSockets APIs.  
 You can get Api information from 
@@ -8,10 +8,19 @@ You can get Api information from
 Put simply, `apex omni` is the official lightweight one-stop-shop module for the Apex omni HTTP and WebSocket APIs. 
 
 ## Development
-`apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.    
-If the user's computer using  arm chip,  change libzklink_sdk-arm.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/   
-If the user's computer using  x86 chip,  change libzklink_sdk-x86.dylib to libzklink_sdk.dylib and replace old libzklink_sdk.dylib in the directory  ./apexpro/ and ./test/     
+- `apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.      
+- If the user's computer using  arm chip,  change (libzklink_sdk-arm.dylib and zklink_sdk-arm.py) to (libzklink_sdk.dylib, zklink_sdk.py) and replace old (libzklink_sdk.dylib and zklink_sdk.py) in the directory  ./apexpro/ and ./test/   
+- If the user's computer using  x86 chip,  change (libzklink_sdk-x86.dylib and zklink_sdk-x86.py) to (libzklink_sdk.dylib, zklink_sdk.py) and replace old (libzklink_sdk.dylib and zklink_sdk.py) in the directory  ./apexpro/ and ./test/     
+- If the user's computer OS is windows,  copy zklink_sdk.dll in the directory  ./apexpro/ and ./test/.  Change zklink_sdk-pc.py to zklink_sdk.py and replace and zklink_sdk.py in the directory  ./apexpro/ and ./test/
+- If the user's computer OS is Linux and x86 chip,  copy zklink_sdk.so in the directory  ./apexpro/ and ./test/.  Change zklink_sdk-pc.py to zklink_sdk.py and replace and zklink_sdk.py in the directory  ./apexpro/ and ./test/
 
+## Installation
+`apex omni` supports Python versions from 3.6 to 3.12. The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
+```
+pip3 install apexomni-arm
+pip3 install apexomni-x86-mac
+pip3 install apexomni-x86-windows-linux
+```
 ## New Basic Usage V3 
 You can create an HTTP session for Inverse on APEX_OMNI_HTTP_TEST or APEX_OMNI_HTTP_MAIN:
 ```python
@@ -326,4 +335,3 @@ while True:
     # Run your main trading logic here.
     sleep(1)
 
-```

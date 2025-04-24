@@ -1,0 +1,40 @@
+[build-system]
+requires = ["setuptools>=42", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "apexomni-x86-mac"
+version = "3.1.0"
+description = "Python3 Apexpro omni HTTP/WebSocket API Connector"
+authors = [
+    {name = "Dexter Dickinson", email = "xxx@apexomni.com"}
+]
+readme = "README.md"
+requires-python = ">=3.6"
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3.6",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+addopts = "-ra -q"
+
+[tool.black]
+line-length = 88
+target-version = ['py36', 'py37', 'py38', 'py39', 'py310', 'py311', 'py312']
+include = '\.pyi?$'
+
+[tool.isort]
+profile = "black"
+multi_line_output = 3

@@ -15,7 +15,7 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 - If the user's computer OS is Linux and x86 chip,  copy zklink_sdk.so in the directory  ./apexpro/ and ./test/.  Change zklink_sdk-pc.py to zklink_sdk.py and replace and zklink_sdk.py in the directory  ./apexpro/ and ./test/
 
 ## Installation
-`apex omni` requires Python 3.6.1 - Python 3.9.x . The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
+`apex omni` supports Python versions from 3.6 to 3.12. The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
 ```
 pip3 install apexomni-arm
 pip3 install apexomni-x86-mac

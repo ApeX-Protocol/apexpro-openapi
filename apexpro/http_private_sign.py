@@ -4,7 +4,7 @@ import time
 
 import numpy as np
 
-import zklink_sdk as sdk
+import apexpro.zklink_sdk as sdk
 from apexpro.constants import URL_SUFFIX, ORDER_SIDE_BUY
 from apexpro.helpers.request_helpers import random_client_id
 from apexpro.http_private_v3 import HttpPrivate_v3

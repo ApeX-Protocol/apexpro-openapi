@@ -1,4 +1,10 @@
 include LICENSE
 include README.md
 include CHANGELOG.md
-recursive-include examples *
+include setup.cfg
+include tox.ini
+include pyproject.toml
+recursive-include apexpro *.json
+recursive-include apexpro *.dylib
+recursive-include apexpro *.dll
+recursive-include apexpro *.so

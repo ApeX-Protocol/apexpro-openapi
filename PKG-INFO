@@ -1,11 +1,11 @@
-Metadata-Version: 1.0.7
-Name: apexpro
-Version: 1.0.8
-Summary: Python3 ApexPro HTTP/WebSocket API Connector
+Metadata-Version: 2.4
+Name: ApexOmni
+Version: 3.1.0
+Summary: Python3 ApexOmni HTTP/WebSocket API Connector
 Home-page: https://github.com/ApeX-Protocol/apexpro-openapi
 Author: Dexter Dickinson
 License: MIT License
-Keywords: apex pro api connector
+Keywords: apex omni api connector
 Platform: UNKNOWN
 Classifier: Development Status :: 4 - Beta
 Classifier: Intended Audience :: Developers
@@ -15,6 +15,9 @@ Classifier: Programming Language :: Python :: 3.6
 Classifier: Programming Language :: Python :: 3.7
 Classifier: Programming Language :: Python :: 3.8
 Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Classifier: Programming Language :: Python :: 3.12
 Requires-Python: >=3.6
 Description-Content-Type: text/markdown
 License-File: LICENSE

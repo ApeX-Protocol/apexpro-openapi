@@ -3,7 +3,7 @@ import json
 import time
 import urllib
 
-import zklink_sdk as sdk
+import apexpro.zklink_sdk as sdk
 from apexpro.constants import URL_SUFFIX, APEX_OMNI_HTTP_TEST
 from apexpro.helpers.request_helpers import random_client_id
 from apexpro.http_private import HttpPrivate
