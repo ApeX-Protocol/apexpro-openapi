@@ -2,13 +2,13 @@ import os
 import sys
 import time
 
-from apexpro.http_private_stark_key_sign import HttpPrivateStark
+from apexomni.http_private_stark_key_sign import HttpPrivateStark
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
+from apexomni.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
 
 print("Hello, Apexpro")
 

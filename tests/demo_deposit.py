@@ -2,17 +2,17 @@ import os
 import sys
 import time
 
-from apexpro.helpers.util import wait_for_condition
-from apexpro.starkex.helpers import nonce_from_client_id
+from apexomni.helpers.util import wait_for_condition
+from apexomni.starkex.helpers import nonce_from_client_id
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.http_private import HttpPrivate
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
+from apexomni.http_private import HttpPrivate
+from apexomni.constants import APEX_HTTP_TEST, NETWORKID_TEST, APEX_HTTP_MAIN, NETWORKID_MAIN
 
-print("Hello, Apexpro")
+print("Hello, apexomni")
 priKey = "your eth private key"
 
 key = 'your apiKey-key from register'

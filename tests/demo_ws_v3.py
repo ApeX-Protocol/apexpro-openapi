@@ -1,7 +1,7 @@
 from time import sleep
 
-from apexpro.constants import APEX_OMNI_WS_MAIN
-from apexpro.websocket_api import WebSocket
+from apexomni.constants import APEX_OMNI_WS_MAIN
+from apexomni.websocket_api import WebSocket
 
 key = 'your apiKey-key from register V3'
 secret = 'your apiKey-secret from register  V3'

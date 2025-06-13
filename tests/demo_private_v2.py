@@ -6,9 +6,9 @@ root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.http_private import HttpPrivate
+from apexomni.http_private import HttpPrivate
 
-from apexpro.constants import APEX_HTTP_TEST, NETWORKID_TEST
+from apexomni.constants import APEX_HTTP_TEST, NETWORKID_TEST
 
 print("Hello, Apexpro")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api

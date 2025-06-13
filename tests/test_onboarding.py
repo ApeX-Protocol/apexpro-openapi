@@ -1,7 +1,7 @@
 from web3 import Web3
 
-from apexpro import HTTP
-from apexpro.constants import REGISTER_ENVID_MAIN
+from apexomni import HTTP
+from apexomni.constants import REGISTER_ENVID_MAIN
 from tests.constants import DEFAULT_HOST
 
 GANACHE_PRIVATE_KEY = (

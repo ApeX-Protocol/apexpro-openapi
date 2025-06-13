@@ -6,8 +6,8 @@ root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
 
-from apexpro.constants import APEX_OMNI_HTTP_MAIN
-from apexpro.http_public import HttpPublic
+from apexomni.constants import APEX_OMNI_HTTP_MAIN
+from apexomni.http_public import HttpPublic
 
 print("Hello, ApexOmni")
 

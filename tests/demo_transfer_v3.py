@@ -2,19 +2,19 @@ import os
 import sys
 import urllib.parse
 
-from apexpro.helpers.request_helpers import random_client_id
+from apexomni.helpers.request_helpers import random_client_id
 
-from apexpro.http_private_sign import HttpPrivateSign
+from apexomni.http_private_sign import HttpPrivateSign
 import os
 import sys
 
-from apexpro.http_private_sign import HttpPrivateSign
+from apexomni.http_private_sign import HttpPrivateSign
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
+from apexomni.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
 
 print("Hello, Apex Omni")
 
@@ -67,6 +67,6 @@ accountData = client.get_account_v3()
 #repaymentRes = client.create_manual_repayment_v3(repaymentTokens=repaymentTokens, poolRepaymentTokens=repaymentTokens, clientId=clientId)
 #print(repaymentRes)
 
-print("end, Apexpro")
+print("end, apexomni")
 
 

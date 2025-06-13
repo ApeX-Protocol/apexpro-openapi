@@ -3,20 +3,20 @@ import os
 import sys
 import time
 
-from apexpro.helpers.util import round_size
+from apexomni.helpers.util import round_size
 
-from apexpro.http_private_sign import HttpPrivateSign
+from apexomni.http_private_sign import HttpPrivateSign
 import os
 import sys
 import time
 
-from apexpro.http_private_sign import HttpPrivateSign
+from apexomni.http_private_sign import HttpPrivateSign
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
+from apexomni.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST, APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB
 
 print("Hello, Apex omni")
 
@@ -27,18 +27,17 @@ passphrase = 'your apiKey-passphrase from register'
 seeds = 'your zk seeds from register'
 l2Key = 'your l2Key seeds from register'
 
-
-client = HttpPrivateSign(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST,
-                          zk_seeds=seeds,zk_l2Key=l2Key,
-                          api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
+client = HttpPrivateSign(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB,
+                         zk_seeds=seeds,zk_l2Key=l2Key,
+                         api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
 configs = client.configs_v3()
 accountData = client.get_account_v3()
 
 
 currentTime = time.time()
 createOrderRes = client.create_order_v3(symbol="BTC-USDT", side="SELL",
-                                        type="MARKET", size="0.001", timestampSeconds= currentTime,
-                                        price="60000")
+                                        type="MARKET", size="0.01", timestampSeconds= currentTime,
+                                        price="113222.2")
 print(createOrderRes)
 
 # sample6

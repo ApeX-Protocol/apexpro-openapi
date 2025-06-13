@@ -1,7 +1,7 @@
 import os
 import sys
 
-from apexpro.helpers.request_helpers import calc_bind_owner_key_sig_hash, starkex_sign, starkex_verify
+from apexomni.helpers.request_helpers import calc_bind_owner_key_sig_hash, starkex_sign, starkex_verify
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])

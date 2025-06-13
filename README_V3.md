@@ -9,23 +9,18 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 
 ## Development
 - `apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.      
-- If the user's computer using  arm chip,  change (libzklink_sdk-arm.dylib and zklink_sdk-arm.py) to (libzklink_sdk.dylib, zklink_sdk.py) and replace old (libzklink_sdk.dylib and zklink_sdk.py) in the directory  ./apexpro/ and ./test/   
-- If the user's computer using  x86 chip,  change (libzklink_sdk-x86.dylib and zklink_sdk-x86.py) to (libzklink_sdk.dylib, zklink_sdk.py) and replace old (libzklink_sdk.dylib and zklink_sdk.py) in the directory  ./apexpro/ and ./test/     
-- If the user's computer OS is windows,  copy zklink_sdk.dll in the directory  ./apexpro/ and ./test/.  Change zklink_sdk-pc.py to zklink_sdk.py and replace and zklink_sdk.py in the directory  ./apexpro/ and ./test/
-- If the user's computer OS is Linux and x86 chip,  copy zklink_sdk.so in the directory  ./apexpro/ and ./test/.  Change zklink_sdk-pc.py to zklink_sdk.py and replace and zklink_sdk.py in the directory  ./apexpro/ and ./test/
 
 ## Installation
-`apex omni` supports Python versions from 3.6 to 3.12. The module can be installed manually or via [apexomni-arm](https://pypi.org/project/apexomni-arm/)  or [apexomni-x86](https://pypi.org/project/apexomni-x86/)  with `pip`:
+`apex omni` supports Python versions from 3.6 to 3.12. The module can be installed manually or via [apexomni](https://pypi.org/project/apexomni/)   with `pip`:
 ```
-pip3 install apexomni-arm
-pip3 install apexomni-x86-mac
-pip3 install apexomni-x86-windows-linux
+pip3 install apexomni
 ```
 ## New Basic Usage V3 
 You can create an HTTP session for Inverse on APEX_OMNI_HTTP_TEST or APEX_OMNI_HTTP_MAIN:
+
 ```python
-from apexpro.constants import APEX_OMNI_HTTP_TEST
-from apexpro.http_public import HttpPublic
+from apexomni.constants import APEX_OMNI_HTTP_TEST
+from apexomni.http_public import HttpPublic
 
 client = HttpPublic(APEX_OMNI_HTTP_TEST)
 ```
@@ -57,9 +52,8 @@ print(client.history_funding_v3(symbol="BTC-USDT"))
 - Since the register_user_v3  is a non-blocking process, you need to sleep for 10 sec before call the change_pub_key_v3() action.
 Please refer to [demo_register_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_register_v3.py)
 
-
 ```python
-from apexpro.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB, NETWORKID_MAIN
+from apexomni.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB, NETWORKID_MAIN
 
 print("Hello, Apex Omni")
 priKey = "your eth private key"
@@ -70,10 +64,11 @@ configs = client.configs_v3()
 zkKeys = client.derive_zk_key(client.default_address)
 print(zkKeys)
 
-nonceRes = client.generate_nonce_v3(refresh="false", l2Key=zkKeys['l2Key'],ethAddress=client.default_address, chainId=NETWORKID_OMNI_MAIN_ARB)
+nonceRes = client.generate_nonce_v3(refresh="false", l2Key=zkKeys['l2Key'], ethAddress=client.default_address,
+                                    chainId=NETWORKID_OMNI_MAIN_ARB)
 
-regRes = client.register_user_v3(nonce=nonceRes['data']['nonce'],l2Key=zkKeys['l2Key'], seeds=zkKeys['seeds'],ethereum_address=client.default_address)
-
+regRes = client.register_user_v3(nonce=nonceRes['data']['nonce'], l2Key=zkKeys['l2Key'], seeds=zkKeys['seeds'],
+                                 ethereum_address=client.default_address)
 
 key = regRes['data']['apiKey']['key']
 secret = regRes['data']['apiKey']['secret']
@@ -83,14 +78,16 @@ time.sleep(10)
 accountRes = client.get_account_v3()
 print(accountRes)
 
-
-#back zkKeys, apiKey,and accountId for private Api or create-oreder transfer or withdraw
+# back zkKeys, apiKey,and accountId for private Api or create-oreder transfer or withdraw
 
 print(regRes['data']['account']['id'])
 print(regRes['data']['apiKey'])
 
-changeRes = client.change_pub_key_v3(chainId=NETWORKID_OMNI_MAIN_ARB, seeds=zkKeys.get('seeds'), ethPrivateKey=priKey, zkAccountId = accountRes.get('spotAccount').get('zkAccountId'), subAccountId = accountRes.get('spotAccount').get('defaultSubAccountId'),
-                                     newPkHash = zkKeys.get('pubKeyHash'),  nonce= accountRes.get('spotAccount').get('nonce'), l2Key= zkKeys.get('l2Key'))
+changeRes = client.change_pub_key_v3(chainId=NETWORKID_OMNI_MAIN_ARB, seeds=zkKeys.get('seeds'), ethPrivateKey=priKey,
+                                     zkAccountId=accountRes.get('spotAccount').get('zkAccountId'),
+                                     subAccountId=accountRes.get('spotAccount').get('defaultSubAccountId'),
+                                     newPkHash=zkKeys.get('pubKeyHash'),
+                                     nonce=accountRes.get('spotAccount').get('nonce'), l2Key=zkKeys.get('l2Key'))
 print(changeRes)
 
 time.sleep(10)
@@ -105,7 +102,7 @@ some authentication information is required to access private endpoints.
 Please refer to [demo_private_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_private_v3.py)
 
 ```python
-from apexpro.constants import APEX_OMNI_HTTP_MAIN, \
+from apexomni.constants import APEX_OMNI_HTTP_MAIN,
     NETWORKID_OMNI_MAIN_ARB
 
 print("Hello, Apex Omni")
@@ -115,12 +112,12 @@ key = 'your apiKey-key from register V3'
 secret = 'your apiKey-secret from register  V3'
 passphrase = 'your apiKey-passphrase from register  V3'
 
-client = HttpPrivate_v3(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB, api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase})
+client = HttpPrivate_v3(APEX_OMNI_HTTP_MAIN, network_id=NETWORKID_OMNI_MAIN_ARB,
+                        api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
 configs = client.configs_v3()
 
 userRes = client.get_user_v3()
 print(userRes)
-
 
 accountRes = client.get_account_v3()
 print(accountRes)
@@ -128,7 +125,7 @@ print(accountRes)
 accountBalanceRes = client.get_account_balance_v3()
 print(accountBalanceRes)
 
-fillsRes = client.fills_v3(limit=100,page=0,symbol="BTC-USDT",side="BUY",token="USDT")
+fillsRes = client.fills_v3(limit=100, page=0, symbol="BTC-USDT", side="BUY", token="USDT")
 print(fillsRes)
 
 transfersRes = client.transfers_v3(limit=100)
@@ -143,16 +140,16 @@ print(transfersRes)
 transferRes = client.contract_transfer_v3(ids='588301879870489180')
 print(transferRes)
 
-#deleteOrderRes = client.delete_order_v3(id="588302655921587036")
-#print(deleteOrderRes)
+# deleteOrderRes = client.delete_order_v3(id="588302655921587036")
+# print(deleteOrderRes)
 
-#deleteOrderRes = client.delete_order_by_client_order_id_v3(id="123456")
-#print(deleteOrderRes)
+# deleteOrderRes = client.delete_order_by_client_order_id_v3(id="123456")
+# print(deleteOrderRes)
 
 openOrdersRes = client.open_orders_v3()
 print(openOrdersRes)
 
-deleteOrdersRes = client.delete_open_orders_v3(symbol="BTC-USDT",)
+deleteOrdersRes = client.delete_open_orders_v3(symbol="BTC-USDT", )
 print(deleteOrdersRes)
 
 historyOrdersRes = client.history_orders_v3(token='USDT')
@@ -176,7 +173,7 @@ print(yesterdayPnlRes)
 historyValueRes = client.history_value_v3()
 print(historyValueRes)
 
-setInitialMarginRateRes = client.set_initial_margin_rate_v3(symbol="BTC-USDT",initialMarginRate="0.05")
+setInitialMarginRateRes = client.set_initial_margin_rate_v3(symbol="BTC-USDT", initialMarginRate="0.05")
 print(setInitialMarginRateRes)
 
 ```
@@ -232,7 +229,7 @@ Several endpoints require a seeds and l2Key signature authentication, namely as 
 - create_order_v3()  to create order
 
 ```python
-from apexpro.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
+from apexomni.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
 
 print("Hello, Apex omni")
 
@@ -243,17 +240,15 @@ passphrase = 'your apiKey-passphrase from register'
 seeds = 'your zk seeds from register'
 l2Key = 'your l2Key seeds from register'
 
-
 client = HttpPrivateSign(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST,
-                          zk_seeds=seeds,zk_l2Key=l2Key,
-                          api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
+                         zk_seeds=seeds, zk_l2Key=l2Key,
+                         api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase})
 configs = client.configs_v3()
 accountData = client.get_account_v3()
 
-
 currentTime = time.time()
 createOrderRes = client.create_order_v3(symbol="BTC-USDT", side="SELL",
-                                        type="MARKET", size="0.001", timestampSeconds= currentTime,
+                                        type="MARKET", size="0.001", timestampSeconds=currentTime,
                                         price="60000")
 print(createOrderRes)
 
@@ -263,27 +258,27 @@ print(createOrderRes)
 #slippage is recommended to be greater than 0.1
 # when buying, the price = price*(1 + slippage). when selling, the price = price*(1 - slippage)
 slippage = decimal.Decimal("-0.1")
-slPrice =  decimal.Decimal("58000") * (decimal.Decimal("1") + slippage)
-tpPrice =  decimal.Decimal("79000") * (decimal.Decimal("1") - slippage)
+slPrice = decimal.Decimal("58000") * (decimal.Decimal("1") + slippage)
+tpPrice = decimal.Decimal("79000") * (decimal.Decimal("1") - slippage)
 
 createOrderRes = client.create_order_v3(symbol="BTC-USDT", side="BUY",
-                                     type="LIMIT", size="0.01",
-                                     price="65000",
-                                     isOpenTpslOrder=True,
-                                     isSetOpenSl=True,
-                                     slPrice=slPrice,
-                                     slSide="SELL",
-                                     slSize="0.01",
-                                     slTriggerPrice="58000",
-                                     isSetOpenTp=True,
-                                     tpPrice=tpPrice,
-                                     tpSide="SELL",
-                                     tpSize="0.01",
-                                     tpTriggerPrice="79000",
-                                     )
+                                        type="LIMIT", size="0.01",
+                                        price="65000",
+                                        isOpenTpslOrder=True,
+                                        isSetOpenSl=True,
+                                        slPrice=slPrice,
+                                        slSide="SELL",
+                                        slSize="0.01",
+                                        slTriggerPrice="58000",
+                                        isSetOpenTp=True,
+                                        tpPrice=tpPrice,
+                                        tpSide="SELL",
+                                        tpSize="0.01",
+                                        tpTriggerPrice="79000",
+                                        )
 print(createOrderRes)
 
-print("end, Apexpro")
+print("end, apexomni")
 
 ```
 
@@ -295,8 +290,8 @@ Please refer to [demo_ws_v3](https://github.com/ApeX-Protocol/apexpro-openapi/bl
 ```python
 from time import sleep
 
-from apexpro.constants import APEX_OMNI_WS_MAIN
-from apexpro.websocket_api import WebSocket
+from apexomni.constants import APEX_OMNI_WS_MAIN
+from apexomni.websocket_api import WebSocket
 
 key = 'your apiKey-key from register V3'
 secret = 'your apiKey-secret from register  V3'

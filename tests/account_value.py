@@ -2,10 +2,10 @@ import decimal
 import time
 from threading import Timer
 
-from apexpro.constants import APEX_WS_TEST, APEX_HTTP_TEST, NETWORKID_TEST
-from apexpro.http_private import HttpPrivate
-from apexpro.http_public import HttpPublic
-from apexpro.websocket_api import WebSocket
+from apexomni.constants import APEX_WS_TEST, APEX_HTTP_TEST, NETWORKID_TEST
+from apexomni.http_private import HttpPrivate
+from apexomni.http_public import HttpPublic
+from apexomni.websocket_api import WebSocket
 
 key = 'your apiKey-key from register'
 secret = 'your apiKey-secret from register'

@@ -1,7 +1,7 @@
 from time import sleep
 
-from apexpro.constants import APEX_WS_TEST
-from apexpro.websocket_api import WebSocket
+from apexomni.constants import APEX_WS_TEST
+from apexomni.websocket_api import WebSocket
 
 
 # Connect with authentication!

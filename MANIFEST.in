@@ -4,7 +4,7 @@ include CHANGELOG.md
 include setup.cfg
 include tox.ini
 include pyproject.toml
-recursive-include apexpro *.json
-recursive-include apexpro *.dylib
-recursive-include apexpro *.dll
-recursive-include apexpro *.so
+recursive-include apexomni *.json
+recursive-include apexomni *.dylib
+recursive-include apexomni *.dll
+recursive-include apexomni *.so

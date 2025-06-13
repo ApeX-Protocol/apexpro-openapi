@@ -1,13 +1,13 @@
 import os
 import sys
 
-from apexpro.http_private_sign import HttpPrivateSign
+from apexomni.http_private_sign import HttpPrivateSign
 
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
 
-from apexpro.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
+from apexomni.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
 
 print("Hello, Apex Omni")
 # need api_key_credentials={'key': key,'secret': secret, 'passphrase': passphrase} for private api
