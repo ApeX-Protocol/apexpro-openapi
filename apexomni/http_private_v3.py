@@ -333,6 +333,14 @@ class HttpPrivate_v3(HttpPrivate):
             data=kwargs
         )
 
+    def delete_orders_v3(self, **kwargs):
+
+        path = URL_SUFFIX + "/v3/delete-orders"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
+
 
     def delete_order_by_client_order_id_v3(self, **kwargs):
         """"
@@ -343,6 +351,12 @@ class HttpPrivate_v3(HttpPrivate):
         """
 
         path = URL_SUFFIX + "/v3/delete-client-order-id"
+        return self._post(
+            endpoint=path,
+            data=kwargs
+        )
+    def delete_order_by_client_order_ids_v3(self, **kwargs):
+        path = URL_SUFFIX + "/v3/delete-client-order-ids"
         return self._post(
             endpoint=path,
             data=kwargs
