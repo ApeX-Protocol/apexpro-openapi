@@ -448,7 +448,10 @@ def get_os_specific_module():
         elif machine == 'arm64':
             from apexomni.arm import zklink_sdk as os_specific
     elif system == 'linux':
-        from apexomni.pc import zklink_sdk as os_specific
+        if machine == 'x86_64':
+            from apexomni.pc.linux_x86 import zklink_sdk as os_specific
+        elif machine == 'arm64':
+            from apexomni.pc.linux_arm import zklink_sdk as os_specific
     elif system == 'windows':
         from apexomni.pc import zklink_sdk as os_specific
     else:
