@@ -431,7 +431,7 @@ class HTTP:
                 else:
                     raise FailedRequestError(
                         request=f'{method} {path}: {req_params}',
-                        message='Conflict. Could not decode JSON.',
+                        message='Conflict. Could not decode JSON: ' + s.text,
                         status_code=409,
                         time=dt.utcnow().strftime("%H:%M:%S")
                     )
