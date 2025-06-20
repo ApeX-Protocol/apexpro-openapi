@@ -165,7 +165,7 @@ class HttpPrivateSign(HttpPrivate_v3):
         if isOpenTpslOrder == True:
             if isSetOpenSl == True:
                 slTriggerPriceType = triggerPriceType
-                slExpiration = timestampSeconds
+                slExpiration = timestampSeconds * 1000
                 slClientId = slClientId or random_client_id()
 
                 slMessage = hashlib.sha256()
@@ -206,7 +206,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
             if isSetOpenTp == True:
                 tpTriggerPriceType = triggerPriceType
-                tpExpiration = timestampSeconds
+                tpExpiration = timestampSeconds * 1000
                 tpClientId = tpClientId or random_client_id()
 
                 tpMessage = hashlib.sha256()
@@ -270,7 +270,7 @@ class HttpPrivateSign(HttpPrivate_v3):
             'slSize': slSize,
             'slTriggerPrice': slTriggerPrice,
             'slTriggerPriceType': slTriggerPriceType,
-            'slExpiration': slExpiration * 1000,
+            'slExpiration': slExpiration,
             'slLimitFee': str(sl_limit_fee_rounded),
             'slSignature': slSignature,
             'tpClientOrderId': tpClientId,
@@ -279,7 +279,7 @@ class HttpPrivateSign(HttpPrivate_v3):
             'tpSize': tpSize,
             'tpTriggerPrice': tpTriggerPrice,
             'tpTriggerPriceType': tpTriggerPriceType,
-            'tpExpiration': tpExpiration * 1000,
+            'tpExpiration': tpExpiration,
             'tpLimitFee': str(tp_limit_fee_rounded),
             'tpSignature': tpSignature,
             'sourceFlag': sourceFlag,
