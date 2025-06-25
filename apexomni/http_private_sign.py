@@ -3,6 +3,7 @@ import hashlib
 import time
 
 import numpy as np
+import json
 
 from apexomni import zklink_sdk as sdk
 from apexomni.constants import URL_SUFFIX, ORDER_SIDE_BUY
@@ -77,6 +78,11 @@ class HttpPrivateSign(HttpPrivate_v3):
                 symbolData = v
         if symbolData is None:
             for k, v in enumerate(self.configV3.get('contractConfig').get('prelaunchContract')):
+                if v.get('symbol') == symbol or v.get('symbolDisplayName') == symbol:
+                    symbolData = v
+
+        if symbolData is None:
+            for k, v in enumerate(self.configV3.get('contractConfig').get('predictionContract')):
                 if v.get('symbol') == symbol or v.get('symbolDisplayName') == symbol:
                     symbolData = v
 
@@ -770,4 +776,249 @@ class HttpPrivateSign(HttpPrivate_v3):
         return self._post(
             endpoint=path,
             data=repaymentData
+        )
+
+    def create_batch_orders_v3(self, orders):
+        createOrders = []
+        for orderModel in orders:
+            price = str(orderModel.price)
+            size = str(orderModel.size)
+            clientId = orderModel.clientId or random_client_id()
+
+            accountId = orderModel.accountId or self.accountV3.get('id')
+            if not accountId:
+                raise Exception(
+                    'No accountId provided' +
+                    'please call get_account_v3()'
+                )
+
+            if not self.configV3:
+                raise Exception(
+                    'No config provided' +
+                    'please call configs_v3()'
+                )
+            symbolData = None
+            currency = {}
+            for k, v in enumerate(self.configV3.get('contractConfig').get('perpetualContract')):
+                if v.get('symbol') == orderModel.symbol or v.get('symbolDisplayName') == orderModel.symbol:
+                    symbolData = v
+            if symbolData is None:
+                for k, v in enumerate(self.configV3.get('contractConfig').get('prelaunchContract')):
+                    if v.get('symbol') == orderModel.symbol or v.get('symbolDisplayName') == orderModel.symbol:
+                        symbolData = v
+            if symbolData is None:
+                for k, v in enumerate(self.configV3.get('contractConfig').get('predictionContract')):
+                    if v.get('symbol') == orderModel.symbol or v.get('symbolDisplayName') == orderModel.symbol:
+                        symbolData = v
+
+            for k, v2 in enumerate(self.configV3.get('contractConfig').get('assets')):
+                if v2.get('token') == symbolData.get('settleAssetId'):
+                    currency = v2
+
+            if symbolData is not None :
+                number = decimal.Decimal(price) / decimal.Decimal(symbolData.get('tickSize'))
+                if number > int(number):
+                    raise Exception(
+                        'the price must Multiple of tickSize'
+                    )
+
+            if not self.zk_seeds:
+                raise Exception(
+                    'No signature provided and client was not ' +
+                    'initialized with zk_seeds'
+                )
+
+            timestampSeconds = orderModel.timestampSeconds or int(time.time())
+            timestampSeconds = int(timestampSeconds + 3600 * 24 * 28)
+
+
+            subAccountId = orderModel.subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
+            takerFeeRate = orderModel.takerFeeRate or self.accountV3.get('contractAccount').get('takerFeeRate')
+            makerFeeRate = orderModel.makerFeeRate or self.accountV3.get('contractAccount').get('makerFeeRate')
+
+            message = hashlib.sha256()
+            message.update(clientId.encode())  # Encode as UTF-8.
+            nonceHash = message.hexdigest()
+            nonceInt = int(nonceHash, 16)
+
+            maxUint32 = np.iinfo(np.uint32).max
+            maxUint64 = np.iinfo(np.uint64).max
+
+            slotId = (nonceInt % maxUint64)/maxUint32
+            nonce = nonceInt % maxUint32
+            accountId = int(accountId, 10) % maxUint32
+
+
+            priceStr = (decimal.Decimal(price) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+            sizeStr = (decimal.Decimal(size) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+
+            takerFeeRateStr =  (decimal.Decimal(takerFeeRate) * decimal.Decimal(10000)).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+            makerFeeRateStr =  (decimal.Decimal(makerFeeRate) * decimal.Decimal(10000)).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+
+            builder = sdk.ContractBuilder(
+                int(accountId),  int(subAccountId), int(slotId), int(nonce),  int(symbolData.get('l2PairId')), sizeStr.__str__(), priceStr.__str__(), orderModel.side == "BUY",  int(takerFeeRateStr), int(makerFeeRateStr),  False
+            )
+
+
+            tx = sdk.Contract(builder)
+            seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+            signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
+            auth_data = signerSeed.sign_musig(tx.get_bytes())
+            signature = auth_data.signature
+
+
+            if orderModel.side == ORDER_SIDE_BUY:
+                human_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                    decimal.Decimal(size),
+                    decimal.Decimal(price)
+                )
+                fee = DECIMAL_CONTEXT_ROUND_UP.multiply(human_cost, decimal.Decimal(takerFeeRate))
+            else:
+                human_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                    decimal.Decimal(size),
+                    decimal.Decimal(price)
+                )
+                fee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(human_cost, decimal.Decimal(takerFeeRate))
+
+            limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                decimal.Decimal(fee),
+                decimal.Decimal(currency.get('showStep')), )
+
+            sl_limit_fee_rounded = None
+            slSignature = None
+            slTriggerPriceType = None
+            slExpiration = None
+            tp_limit_fee_rounded = None
+            tpSignature = None
+            tpTriggerPriceType = None
+            tpExpiration = None
+
+            if orderModel.isOpenTpslOrder == True:
+                if orderModel.isSetOpenSl == True:
+                    slTriggerPriceType = orderModel.triggerPriceType
+                    slExpiration = timestampSeconds * 1000
+                    slClientId = orderModel.slClientId or random_client_id()
+
+                    slMessage = hashlib.sha256()
+                    slMessage.update(slClientId.encode())  # Encode as UTF-8.
+                    slNonceHash = slMessage.hexdigest()
+                    slNonceInt = int(slNonceHash, 16)
+
+                    slSlotId = (slNonceInt % maxUint64)/maxUint32
+                    slNonce = slNonceInt % maxUint32
+
+                    slPriceStr = (decimal.Decimal(str(orderModel.slPrice)) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+                    slSizeStr = (decimal.Decimal(str(orderModel.slSize)) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+
+                    slBuilder = sdk.ContractBuilder(
+                        int(accountId),  int(subAccountId), int(slSlotId), int(slNonce),  int(symbolData.get('l2PairId')), slSizeStr.__str__(), slPriceStr.__str__(), slSide == "BUY",  int(takerFeeRateStr), int(makerFeeRateStr),  False
+                    )
+
+                    slTx = sdk.Contract(slBuilder)
+                    sl_auth_data = signerSeed.sign_musig(slTx.get_bytes())
+                    slSignature = sl_auth_data.signature
+
+                    if orderModel.slSide == ORDER_SIDE_BUY:
+                        slHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                            decimal.Decimal(str(orderModel.slSize)),
+                            decimal.Decimal(str(orderModel.slPrice))
+                        )
+                        slFee = DECIMAL_CONTEXT_ROUND_UP.multiply(slHuman_cost, decimal.Decimal(takerFeeRate))
+                    else:
+                        slHuman_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                            decimal.Decimal(str(orderModel.slSize)),
+                            decimal.Decimal(str(orderModel.slPrice))
+                        )
+                        slFee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(slHuman_cost, decimal.Decimal(takerFeeRate))
+
+                    sl_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                        decimal.Decimal(slFee),
+                        decimal.Decimal(currency.get('showStep')), )
+
+                if orderModel.isSetOpenTp == True:
+                    tpTriggerPriceType = orderModel.triggerPriceType
+                    tpExpiration = timestampSeconds * 1000
+                    tpClientId = orderModel.tpClientId or random_client_id()
+
+                    tpMessage = hashlib.sha256()
+                    tpMessage.update(tpClientId.encode())  # Encode as UTF-8.
+                    tpNonceHash = tpMessage.hexdigest()
+                    tpNonceInt = int(tpNonceHash, 16)
+
+                    tpSlotId = (tpNonceInt % maxUint64)/maxUint32
+                    tpNonce = tpNonceInt % maxUint32
+
+                    tpPriceStr = (decimal.Decimal(str(orderModel.tpPrice)) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+                    tpSizeStr = (decimal.Decimal(str(orderModel.tpSize)) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_DOWN)
+
+                    tpBuilder = sdk.ContractBuilder(
+                        int(accountId),  int(subAccountId), int(tpSlotId), int(tpNonce),  int(symbolData.get('l2PairId')), tpSizeStr.__str__(), tpPriceStr.__str__(), tpSide == "BUY",  int(takerFeeRateStr), int(makerFeeRateStr),  False
+                    )
+
+                    tpTx = sdk.Contract(tpBuilder)
+                    tp_auth_data = signerSeed.sign_musig(tpTx.get_bytes())
+                    tpSignature = tp_auth_data.signature
+
+                    if orderModel.tpSide == ORDER_SIDE_BUY:
+                        tpHuman_cost = DECIMAL_CONTEXT_ROUND_UP.multiply(
+                            decimal.Decimal(str(orderModel.tpSize)),
+                            decimal.Decimal(str(orderModel.tpPrice))
+                        )
+                        tpFee = DECIMAL_CONTEXT_ROUND_UP.multiply(tpHuman_cost, decimal.Decimal(takerFeeRate))
+                    else:
+                        tpHuman_cost = DECIMAL_CONTEXT_ROUND_DOWN.multiply(
+                            decimal.Decimal(str(orderModel.tpSize)),
+                            decimal.Decimal(str(orderModel.tpPrice))
+                        )
+                        tpFee = DECIMAL_CONTEXT_ROUND_DOWN.multiply(tpHuman_cost, decimal.Decimal(takerFeeRate))
+
+                    tp_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
+                        decimal.Decimal(tpFee),
+                        decimal.Decimal(currency.get('showStep')), )
+
+            order = {
+                'symbol': orderModel.symbol,
+                'side': orderModel.side,
+                'type': orderModel.type,
+                'timeInForce': orderModel.timeInForce,
+                'size': size,
+                'price': price,
+                'limitFee': str(limit_fee_rounded),
+                'expiration': timestampSeconds * 1000,
+                'triggerPrice': orderModel.triggerPrice,
+                'triggerPriceType': orderModel.triggerPriceType,
+                'trailingPercent': orderModel.trailingPercent,
+                'clientId': clientId,
+                'signature': signature,
+                'reduceOnly': orderModel.reduceOnly,
+                'isPositionTpsl': orderModel.isPositionTpsl,
+                'isOpenTpslOrder': orderModel.isOpenTpslOrder,
+                'isSetOpenSl': orderModel.isSetOpenSl,
+                'isSetOpenTp': orderModel.isSetOpenTp,
+                'slClientOrderId': orderModel.slClientId,
+                'slPrice': orderModel.slPrice,
+                'slSide': orderModel.slSide,
+                'slSize': orderModel.slSize,
+                'slTriggerPrice': orderModel.slTriggerPrice,
+                'slTriggerPriceType': slTriggerPriceType,
+                'slExpiration': slExpiration,
+                'slLimitFee': str(sl_limit_fee_rounded),
+                'slSignature': slSignature,
+                'tpClientOrderId': orderModel.tpClientId,
+                'tpPrice': orderModel.tpPrice,
+                'tpSide': orderModel.tpSide,
+                'tpSize': orderModel.tpSize,
+                'tpTriggerPrice': orderModel.tpTriggerPrice,
+                'tpTriggerPriceType': tpTriggerPriceType,
+                'tpExpiration': tpExpiration,
+                'tpLimitFee': str(tp_limit_fee_rounded),
+                'tpSignature': tpSignature,
+                'sourceFlag': orderModel.sourceFlag,
+                'brokerId':orderModel.brokerId,
+            }
+            createOrders.append(order)
+        path = URL_SUFFIX + "/v3/batch-orders"
+        return self._post(
+            endpoint=path,
+            data= {'orders':json.dumps(createOrders)}
         )
