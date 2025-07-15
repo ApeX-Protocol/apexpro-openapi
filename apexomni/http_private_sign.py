@@ -157,7 +157,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
         limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
             decimal.Decimal(fee),
-            decimal.Decimal(currency.get('showStep')), )
+            decimal.Decimal("0.000001"), )
 
         sl_limit_fee_rounded = None
         slSignature = None
@@ -170,6 +170,8 @@ class HttpPrivateSign(HttpPrivate_v3):
 
         if isOpenTpslOrder == True:
             if isSetOpenSl == True:
+                slPrice = str(slPrice)
+                slSize = str(slSize)
                 slTriggerPriceType = triggerPriceType
                 slExpiration = timestampSeconds * 1000
                 slClientId = slClientId or random_client_id()
@@ -208,9 +210,11 @@ class HttpPrivateSign(HttpPrivate_v3):
 
                 sl_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
                     decimal.Decimal(slFee),
-                    decimal.Decimal(currency.get('showStep')), )
+                    decimal.Decimal("0.000001"), )
 
             if isSetOpenTp == True:
+                tpPrice = str(tpPrice)
+                tpSize = str(tpSize)
                 tpTriggerPriceType = triggerPriceType
                 tpExpiration = timestampSeconds * 1000
                 tpClientId = tpClientId or random_client_id()
@@ -249,7 +253,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
                 tp_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
                     decimal.Decimal(tpFee),
-                    decimal.Decimal(currency.get('showStep')), )
+                    decimal.Decimal("0.000001"), )
 
         order = {
             'symbol': symbol,
@@ -882,7 +886,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
             limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
                 decimal.Decimal(fee),
-                decimal.Decimal(currency.get('showStep')), )
+                decimal.Decimal("0.000001"), )
 
             sl_limit_fee_rounded = None
             slSignature = None
@@ -933,7 +937,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
                     sl_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
                         decimal.Decimal(slFee),
-                        decimal.Decimal(currency.get('showStep')), )
+                        decimal.Decimal("0.000001"), )
 
                 if orderModel.isSetOpenTp == True:
                     tpTriggerPriceType = orderModel.triggerPriceType
@@ -974,7 +978,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
                     tp_limit_fee_rounded = DECIMAL_CONTEXT_ROUND_UP.quantize(
                         decimal.Decimal(tpFee),
-                        decimal.Decimal(currency.get('showStep')), )
+                        decimal.Decimal("0.000001"), )
 
             order = {
                 'symbol': orderModel.symbol,
