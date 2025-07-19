@@ -108,6 +108,9 @@ class _WebSocketManager:
         """
         self.private_websocket = True if url.__contains__("private") else False
 
+        if hasattr(self, 'ws') and self.ws.sock and self.ws.sock.connected:
+            logger.warning("WebSocket is already connected. Skipping reconnect.")
+            return
         time_stamp = generate_now()
         self.ws = websocket.WebSocketApp(
             url=url + '&timestamp=' + str(time_stamp),
