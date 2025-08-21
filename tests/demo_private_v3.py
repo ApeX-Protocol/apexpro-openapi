@@ -28,8 +28,8 @@ print(userRes)
 accountRes = client.get_account_v3()
 print(accountRes)
 
-currentTime = time.time()*1000
-withdrawRes = client.withdraws_by_time_and_status_v3(startTime=int(currentTime), status='success')
+positions = accountRes.get('positions')
+print(positions)
 
 accountBalanceRes = client.get_account_balance_v3()
 print(accountBalanceRes)
