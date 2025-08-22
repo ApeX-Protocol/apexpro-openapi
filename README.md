@@ -15,6 +15,22 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 ```
 pip3 install apexomni
 ```
+## Configuration
+- **`priKey` (required):** When initializing `HttpPrivate_v3`, provide **your own private key** so the client can derive zk keys (`seeds`, `l2Key`) and perform payload signing.
+- **Endpoint & Network:** Set the correct endpoint (`APEX_OMNI_HTTP_MAIN` or test) and `network_id` (`NETWORKID_MAIN`, etc.).
+- **Secrets:** Store the private key securely; never log it. In multi-replica environments, persist derived `seeds/l2Key` and reuse them (no need to re-derive per request).
+
+```python
+# Minimal example
+from apexomni.http_private_v3 import HttpPrivate_v3
+from apexomni.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_MAIN
+
+client = HttpPrivate_v3(
+    APEX_OMNI_HTTP_MAIN,
+    network_id=NETWORKID_MAIN,
+    priKey="0xYourPrivateKey"  # required
+)
+```
 ## New Basic Usage V3 
 You can create an HTTP session for Inverse on APEX_OMNI_HTTP_TEST or APEX_OMNI_HTTP_MAIN:
 
