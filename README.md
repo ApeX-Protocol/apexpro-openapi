@@ -16,19 +16,35 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 pip3 install apexomni
 ```
 ## Configuration
-- **`priKey` (required):** When initializing `HttpPrivate_v3`, provide **your own private key** so the client can derive zk keys (`seeds`, `l2Key`) and perform payload signing.
-- **Endpoint & Network:** Set the correct endpoint (`APEX_OMNI_HTTP_MAIN` or test) and `network_id` (`NETWORKID_MAIN`, etc.).
-- **Secrets:** Store the private key securely; never log it. In multi-replica environments, persist derived `seeds/l2Key` and reuse them (no need to re-derive per request).
+## Configuration
+
+- **API key credentials**
+  - `key`, `secret`, `passphrase` — generate at **https://omni.apex.exchange/keyManagement** by clicking **Generate API**.
+
+- **ZK materials**
+  - `seeds` — get it at **https://omni.apex.exchange/keyManagement** by clicking **Omni Key**.
+  - `l2Key` — not shown in keyManagement; set to `''` (empty) or derive locally if needed.
+
+- **Endpoint & Network:**  
+  Use the correct endpoint and network ID for your environment.
 
 ```python
-# Minimal example
-from apexomni.http_private_v3 import HttpPrivate_v3
-from apexomni.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_MAIN
+from apexomni.http_private_v3 import HttpPrivateSign
+from apexomni.constants import APEX_OMNI_HTTP_TEST, NETWORKID_OMNI_TEST_BNB
 
-client = HttpPrivate_v3(
-    APEX_OMNI_HTTP_MAIN,
-    network_id=NETWORKID_MAIN,
-    priKey="0xYourPrivateKey"  # required
+key = 'your apiKey-key from register'
+secret = 'your apiKey-secret from register'
+passphrase = 'your apiKey-passphrase from register'
+
+seeds = 'your zk seeds from register'
+l2Key = 'your l2Key seeds from register'  # optional; can be ''
+
+client = HttpPrivateSign(
+    APEX_OMNI_HTTP_TEST,
+    network_id=NETWORKID_OMNI_TEST_BNB,
+    zk_seeds=seeds,
+    zk_l2Key=l2Key,
+    api_key_credentials={'key': key, 'secret': secret, 'passphrase': passphrase},
 )
 ```
 ## New Basic Usage V3 
