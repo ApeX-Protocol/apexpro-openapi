@@ -16,7 +16,6 @@ Put simply, `apex omni` is the official lightweight one-stop-shop module for the
 pip3 install apexomni
 ```
 ## Configuration
-## Configuration
 
 - **API key credentials**
   - `key`, `secret`, `passphrase` — generate at **https://omni.apex.exchange/keyManagement** by clicking **Generate API**.
