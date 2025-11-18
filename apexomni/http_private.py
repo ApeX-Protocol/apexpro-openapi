@@ -16,22 +16,27 @@ class HttpPrivate(HttpPublic):
             self,
             method,
             path,
-            data={},
-            headers=None
+            data=None,
+            headers=None,
+            account_type=None,
     ):
+        data = data or {}
         now_iso = generate_now()
-        if self.api_key_credentials is not None:
+        account_type = account_type or getattr(self, "_default_account_type", "primary")
+        credentials = self._get_api_credentials(account_type)
+        if credentials is not None:
             signature = self.sign(
                 request_path=path,
                 method=method.upper(),
                 iso_timestamp=str(now_iso),
                 data=data,
+                credentials=credentials,
             )
             headers = {
                 'APEX-SIGNATURE': signature,
-                'APEX-API-KEY': self.api_key_credentials.get('key'),
+                'APEX-API-KEY': credentials.get('key'),
                 'APEX-TIMESTAMP': str(now_iso),
-                'APEX-PASSPHRASE': self.api_key_credentials.get('passphrase'),
+                'APEX-PASSPHRASE': credentials.get('passphrase'),
             }
         return self._submit_request(
             method=method,
@@ -40,18 +45,20 @@ class HttpPrivate(HttpPublic):
             query=data,
         )
 
-    def _get(self, endpoint, params):
+    def _get(self, endpoint, params, account_type=None):
         return self._private_request(
             'GET',
             generate_query_path(endpoint, params),
+            account_type=account_type,
         )
 
-    def _post(self, endpoint, data, headers=None):
+    def _post(self, endpoint, data, headers=None, account_type=None):
         return self._private_request(
             'POST',
             endpoint,
             data,
-            headers
+            headers,
+            account_type=account_type,
         )
 
     # ============ Signing ============
@@ -62,6 +69,7 @@ class HttpPrivate(HttpPublic):
             method,
             iso_timestamp,
             data,
+            credentials=None,
     ):
         sortedItems=sorted(data.items(),key=lambda x:x[0],reverse=False)
         dataString = '&'.join('{key}={value}'.format(
@@ -73,14 +81,42 @@ class HttpPrivate(HttpPublic):
                 request_path +
                 dataString
         )
+        credentials = credentials or self.api_key_credentials
+        if credentials is None:
+            raise ValueError('API credentials are required to sign the request')
         hashed = hmac.new(
             base64.standard_b64encode(
-                (self.api_key_credentials.get('secret')).encode(encoding='utf-8'),
+                (credentials.get('secret')).encode(encoding='utf-8'),
             ),
             msg=message_string.encode(encoding='utf-8'),
             digestmod=hashlib.sha256,
         )
         return base64.standard_b64encode(hashed.digest()).decode()
+
+    def _set_api_key_credentials(self, credentials, account_type="primary"):
+        if not hasattr(self, "_api_key_credentials"):
+            self._api_key_credentials = {}
+        if credentials:
+            self._api_key_credentials[account_type] = credentials
+        else:
+            self._api_key_credentials.pop(account_type, None)
+        if account_type == "primary":
+            self.api_key_credentials = credentials
+
+    def _get_api_key_credentials_map(self):
+        if not hasattr(self, "_api_key_credentials"):
+            self._api_key_credentials = {}
+        return self._api_key_credentials
+
+    def _get_api_credentials(self, account_type="primary"):
+        credentials_map = self._get_api_key_credentials_map()
+        return credentials_map.get(account_type) or credentials_map.get("primary")
+
+    def set_api_credentials(self, credentials, account_type="primary"):
+        """
+        Register API key credentials for the given account type.
+        """
+        self._set_api_key_credentials(credentials, account_type=account_type)
 
     def generate_nonce(self, starkKey, ethAddress, chainId,
                        refresh="false"
@@ -1004,4 +1040,3 @@ class HttpPrivate(HttpPublic):
             endpoint=path,
             params=kwargs
         )
-

@@ -8,8 +8,6 @@ from apexomni.http_private_sign import HttpPrivateSign
 import os
 import sys
 
-from apexomni.http_private_sign import HttpPrivateSign
-
 root_path = os.path.abspath(__file__)
 root_path = '/'.join(root_path.split('/')[:-2])
 sys.path.append(root_path)
@@ -18,12 +16,12 @@ from apexomni.constants import NETWORKID_TEST, APEX_OMNI_HTTP_TEST
 
 print("Hello, Apex Omni")
 
-key = 'your apiKey-key from register'
-secret = 'your apiKey-secret from register'
-passphrase = 'your apiKey-passphrase from register'
+key = '144bf7bd-de5b-5d17-40be-784d976dadbe'
+secret = 'Va69MIsvg7SZPsnSF5DxJeZ-qTiqSt_t1tLWQo33'
+passphrase = '9ABtpDyNhooUPC5QsN08'
 
-seeds = 'your zk seeds from register'
-l2Key = 'your l2Key seeds from register'
+seeds = '62c4e1a48dbaa16ef7e35c13c95a441c467a3207e8fef80b49611863320ef42779c59f71324908af68291be94e0ce02e25e41149f67c479a4235097f47466b251c'
+l2Key = '0x6c2eb74273c402a237520e9b298c9bc970d9a6fa6babe50235b1510e71bea484'
 
 
 client = HttpPrivateSign(APEX_OMNI_HTTP_TEST, network_id=NETWORKID_TEST,
@@ -43,15 +41,15 @@ accountData = client.get_account_v3()
 #print(createWithdrawRes)
 
 #smple3 transfer_out,  from fund account to contract account
-#createTransferRes = client.create_transfer_out_v3(amount='3.4359738368',asset='USDT')
-#print(createTransferRes)
+createTransferRes = client.create_transfer_out_v3(amount='3.4359738368',asset='USDT')
+print(createTransferRes)
 
 #createTransferRes = client.create_transfer_out_v3(amount='0.01',asset='ETH')
 #print(createTransferRes)
 
 #smple4 contract transfer_out, from contract account to fund account
-#createContractTransferRes = client.create_contract_transfer_out_v3(amount='0.005',asset='ETH')
-#print(createContractTransferRes)
+# createContractTransferRes = client.create_contract_transfer_out_v3(amount='0.1',asset='USDT')
+# print(createContractTransferRes)
 
 #smple5 contract contract_transfer_to_address,   from one contract account to another contract account
 #createContractTransferRes = client.create_contract_transfer_to_address_v3(amount='1.1',asset='USDT',receiverAddress='0xfab6256aeef3be7805d3138be8fe1369f716ebc5',receiverAccountId='585750146675900485',receiverL2Key='0x04a234f299958150707451f649208fd085680bf3e1be432acb533eb2cc06082a')

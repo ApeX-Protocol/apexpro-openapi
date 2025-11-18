@@ -126,7 +126,6 @@ class HTTP:
         # Set web3 keys.
         self.eth_send_options = eth_send_options or {}
         self.stark_private_key = stark_private_key
-        self.api_key_credentials = api_key_credentials
         self.stark_public_key_y_coordinate = stark_public_key_y_coordinate
         self.zk_seeds = zk_seeds
         self.zk_l2Key = zk_l2Key
@@ -179,9 +178,13 @@ class HTTP:
             self.stark_public_key_y_coordinate = stark_public_key_y_coordinate
 
         self.api_key_credentials = api_key_credentials
+        self._api_key_credentials = {}
+        if api_key_credentials:
+            self._api_key_credentials['primary'] = api_key_credentials
 
         self.signer = SignOnboardingAction(self.eth_signer, self.network_id)
         self.starkeySigner = SignOnboardingAction(self.eth_signer, self.env_id)
+        self._default_account_type = "primary"
 
         # Set timeout.
         self.timeout = request_timeout
@@ -396,9 +399,12 @@ class HTTP:
                 )
             elif method == 'POST':
                 r = self.client.prepare_request(
-                    requests.Request(method, path,
-                                     data=req_params,
-                                     headers=headers)
+                    requests.Request(
+                        method,
+                        path,
+                        data=req_params,
+                        headers=headers
+                    )
                 )
 
             # Attempt the request.

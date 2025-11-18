@@ -10,7 +10,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 setup(
     name='apexomni-x86-mac',
-    version='3.1.0',
+    version='3.2.0',
     packages=find_packages(),
     description='Python3 Apexpro omni HTTP/WebSocket API Connector',
     long_description=long_description,

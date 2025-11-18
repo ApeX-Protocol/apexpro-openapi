@@ -8,11 +8,36 @@ import json
 from apexomni import zklink_sdk as sdk
 from apexomni.constants import URL_SUFFIX, ORDER_SIDE_BUY
 from apexomni.helpers.request_helpers import random_client_id
-from apexomni.http_private_v3 import HttpPrivate_v3
+from apexomni.http_private_v3 import HttpPrivate_v3, HttpPrivateStock_v3
 from apexomni.starkex.order import DECIMAL_CONTEXT_ROUND_UP, DECIMAL_CONTEXT_ROUND_DOWN
 
 
 class HttpPrivateSign(HttpPrivate_v3):
+    def _get_account_snapshot(self, account_type=None):
+        if hasattr(self, "_get_account_context"):
+            return self._get_account_context(account_type)
+        return getattr(self, "accountV3", None)
+
+    def _resolve_signing_seeds(self, account_type=None):
+        """
+        Choose signing seeds based on the current account type.
+        Prefers cached stock seeds when signing under the stock account.
+        """
+        account_type = account_type or getattr(self, "_default_account_type", "primary")
+        if account_type == getattr(self, "stock_account_type", None):
+            seeds = getattr(self, "stock_zk_seeds", None) or self.zk_seeds
+            if seeds:
+                return seeds
+        return self.zk_seeds
+
+    def _ensure_account_snapshot(self, account_type=None):
+        account = self._get_account_snapshot(account_type)
+        if not account:
+            raise Exception(
+                'No account data cached, please call get_account_v3()'
+            )
+        return account
+
     def create_order_v3(self,
                      symbol,
                      side,
@@ -46,7 +71,8 @@ class HttpPrivateSign(HttpPrivate_v3):
                      tpSize=None,
                      tpTriggerPrice=None,
                      sourceFlag=None,
-                     brokerId=None,):
+                     brokerId=None,
+                     account_type=None,):
         """"
         POST  create_order.
         client.create_order(symbol="BTC-USDT", side="SELL",
@@ -59,7 +85,10 @@ class HttpPrivateSign(HttpPrivate_v3):
         size = str(size)
         clientId = clientId or random_client_id()
 
-        accountId = accountId or self.accountV3.get('id')
+        active_account_type = account_type or getattr(self, "_default_account_type", "primary")
+        account = self._ensure_account_snapshot(active_account_type)
+
+        accountId = accountId or account.get('id')
         if not accountId:
             raise Exception(
                 'No accountId provided' +
@@ -85,6 +114,10 @@ class HttpPrivateSign(HttpPrivate_v3):
             for k, v in enumerate(self.configV3.get('contractConfig').get('predictionContract')):
                 if v.get('symbol') == symbol or v.get('symbolDisplayName') == symbol:
                     symbolData = v
+        if symbolData is None:
+            for k, v in enumerate(self.configV3.get('contractConfig').get('stockContract')):
+                if v.get('symbol') == symbol or v.get('symbolDisplayName') == symbol:
+                    symbolData = v
 
         for k, v2 in enumerate(self.configV3.get('contractConfig').get('assets')):
             if v2.get('token') == symbolData.get('settleAssetId'):
@@ -97,19 +130,19 @@ class HttpPrivateSign(HttpPrivate_v3):
                     'the price must Multiple of tickSize'
                 )
 
-        if not self.zk_seeds:
+        signing_seeds = self._resolve_signing_seeds(active_account_type)
+        if not signing_seeds:
             raise Exception(
-                'No signature provided and client was not ' +
-                'initialized with zk_seeds'
+                'No signing seeds provided; set seeds for the active account type'
             )
 
         timestampSeconds = timestampSeconds or int(time.time())
         timestampSeconds = int(timestampSeconds + 3600 * 24 * 28)
 
 
-        subAccountId = subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
-        takerFeeRate = takerFeeRate or self.accountV3.get('contractAccount').get('takerFeeRate')
-        makerFeeRate = makerFeeRate or self.accountV3.get('contractAccount').get('makerFeeRate')
+        subAccountId = 0
+        takerFeeRate = takerFeeRate or account.get('contractAccount').get('takerFeeRate')
+        makerFeeRate = makerFeeRate or account.get('contractAccount').get('makerFeeRate')
 
         message = hashlib.sha256()
         message.update(clientId.encode())  # Encode as UTF-8.
@@ -136,7 +169,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
 
         tx = sdk.Contract(builder)
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
         auth_data = signerSeed.sign_musig(tx.get_bytes())
         signature = auth_data.signature
@@ -299,7 +332,8 @@ class HttpPrivateSign(HttpPrivate_v3):
         path = URL_SUFFIX + "/v3/order"
         return self._post(
             endpoint=path,
-            data=order
+            data=order,
+            account_type=account_type,
         )
 
     def create_withdrawal_v3(self,
@@ -319,24 +353,26 @@ class HttpPrivateSign(HttpPrivate_v3):
                           signature=None, ):
 
         clientId = clientId or random_client_id()
-        if not self.zk_seeds:
+        active_account_type = getattr(self, "_default_account_type", "primary")
+        signing_seeds = self._resolve_signing_seeds(active_account_type)
+        if not signing_seeds:
             raise Exception(
-                'No signature provided and client was not ' +
-                'initialized with zk_seeds'
+                'No signing seeds provided; set seeds for the active account type'
             )
 
         timestampSeconds =  int(timestampSeconds or int(time.time()))
 
 
-        ethAddress = ethAddress or self.accountV3.get('ethereumAddress')
+        account = self._ensure_account_snapshot(account_type=None)
+        ethAddress = ethAddress or account.get('ethereumAddress')
 
-        zkAccountId = zkAccountId or self.accountV3.get('spotAccount').get('zkAccountId')
+        zkAccountId = zkAccountId or account.get('spotAccount').get('zkAccountId')
 
-        subAccountId = subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
+        subAccountId = subAccountId or account.get('spotAccount').get('defaultSubAccountId')
 
-        nonce = nonce or self.accountV3.get('spotAccount').get('subAccounts')[0].get('nonce')
+        nonce = nonce or account.get('spotAccount').get('subAccounts')[0].get('nonce')
 
-        l2Key = self.zk_l2Key or self.accountV3.get('l2Key')
+        l2Key = self.zk_l2Key or account.get('l2Key')
         if not ethAddress:
             raise Exception(
                 'No ethAddress provided' +
@@ -374,7 +410,7 @@ class HttpPrivateSign(HttpPrivate_v3):
             int(l1TargetTokenId), amountStr.__str__(), None, '0', int(nonce),  int(withdraw_fee_ratio),  False, int(timestampSeconds)
         )
         tx = sdk.Withdraw(builder)
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
 
         auth_data = signerSeed.sign_musig(tx.get_bytes())
@@ -420,10 +456,11 @@ class HttpPrivateSign(HttpPrivate_v3):
                              signature=None, ):
 
         clientId = clientId or random_client_id()
-        if not self.zk_seeds:
+        active_account_type = getattr(self, "_default_account_type", "primary")
+        signing_seeds = self._resolve_signing_seeds(active_account_type)
+        if not signing_seeds:
             raise Exception(
-                'No signature provided and client was not ' +
-                'initialized with zk_seeds'
+                'No signing seeds provided; set seeds for the active account type'
             )
 
         timestampSeconds =  int(timestampSeconds or int(time.time()))
@@ -457,7 +494,7 @@ class HttpPrivateSign(HttpPrivate_v3):
         )
 
         tx = sdk.Transfer(builder)
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
 
         auth_data = signerSeed.sign_musig(tx.get_bytes())
@@ -487,10 +524,10 @@ class HttpPrivateSign(HttpPrivate_v3):
         )
 
     def create_transfer_out_to_address_v3(self,
-                               amount,
-                               asset,
-                               nonce=None,
-                               tokenId=None,
+                                   amount,
+                                   asset,
+                                   nonce=None,
+                                   tokenId=None,
                                zkAccountId=None,
                                subAccountId=None,
                                fee='0',
@@ -498,15 +535,16 @@ class HttpPrivateSign(HttpPrivate_v3):
                                timestampSeconds=None,
                                receiverAccountId=None,
                                receiverZkAccountId=None,
-                               receiverSubAccountId=None,
-                               receiverAddress=None,
-                               signature=None, ):
+                                   receiverSubAccountId=None,
+                                   receiverAddress=None,
+                                   signature=None, ):
 
         clientId = clientId or random_client_id()
-        if not self.zk_seeds:
+        active_account_type = getattr(self, "_default_account_type", "primary")
+        signing_seeds = self._resolve_signing_seeds(active_account_type)
+        if not signing_seeds:
             raise Exception(
-                'No signature provided and client was not ' +
-                'initialized with zk_seeds'
+                'No signing seeds provided; set seeds for the active account type'
             )
 
         timestampSeconds =  int(timestampSeconds or int(time.time()))
@@ -537,7 +575,7 @@ class HttpPrivateSign(HttpPrivate_v3):
         )
 
         tx = sdk.Transfer(builder)
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
 
         auth_data = signerSeed.sign_musig(tx.get_bytes())
@@ -584,10 +622,11 @@ class HttpPrivateSign(HttpPrivate_v3):
                                         signature=None, ):
 
         clientId = clientId or random_client_id()
-        if not self.zk_seeds:
+        active_account_type = getattr(self, "_default_account_type", "primary")
+        signing_seeds = self._resolve_signing_seeds(active_account_type)
+        if not signing_seeds:
             raise Exception(
-             'No signature provided and client was not ' +
-             'initialized with zk_seeds'
+                'No signing seeds provided; set seeds for the active account type'
             )
 
         timestampSeconds =  timestampSeconds or int(time.time())
@@ -630,7 +669,7 @@ class HttpPrivateSign(HttpPrivate_v3):
         )
 
         tx = sdk.Transfer(builder)
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
 
         auth_data = signerSeed.sign_musig(tx.get_bytes())
@@ -676,7 +715,7 @@ class HttpPrivateSign(HttpPrivate_v3):
         timestampSeconds =  timestampSeconds or int(time.time())
         timestampSeconds = int(timestampSeconds + 3600 * 24 * 28)
         accountId = accountId or self.accountV3.get('id')
-        subAccountId = subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
+        subAccountId = subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId') or 0
         receiverSubAccountId = receiverSubAccountId or 0
 
         message = hashlib.sha256()
@@ -710,7 +749,10 @@ class HttpPrivateSign(HttpPrivate_v3):
         )
 
         tx = sdk.Transfer(builder)
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        signing_seeds = self._resolve_signing_seeds(account_type=getattr(self, "_default_account_type", "primary"))
+        if signing_seeds is None:
+            raise Exception('No signing seeds available for contract transfer')
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
 
         auth_data = signerSeed.sign_musig(tx.get_bytes())
@@ -741,10 +783,11 @@ class HttpPrivateSign(HttpPrivate_v3):
                                    signature=None, ):
 
         clientId = clientId or random_client_id()
-        if not self.zk_seeds:
+        active_account_type = getattr(self, "_default_account_type", "primary")
+        signing_seeds = self._resolve_signing_seeds(active_account_type)
+        if not signing_seeds:
             raise Exception(
-                'No signature provided and client was not ' +
-                'initialized with zk_seeds'
+                'No signing seeds provided; set seeds for the active account type'
             )
 
         timestampSeconds =  timestampSeconds or int(time.time())
@@ -763,7 +806,7 @@ class HttpPrivateSign(HttpPrivate_v3):
         bn2 = int (EC_ORDER, 10)
         signMsg = hex(bn1.__mod__(bn2))
 
-        seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+        seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
         signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
         signatureData = signerSeed.sign_musig(signMsg.removeprefix('0x').encode())
         signature = signatureData.signature
@@ -826,10 +869,11 @@ class HttpPrivateSign(HttpPrivate_v3):
                         'the price must Multiple of tickSize'
                     )
 
-            if not self.zk_seeds:
+            active_account_type = getattr(self, "_default_account_type", "primary")
+            signing_seeds = self._resolve_signing_seeds(active_account_type)
+            if not signing_seeds:
                 raise Exception(
-                    'No signature provided and client was not ' +
-                    'initialized with zk_seeds'
+                    'No signing seeds provided; set seeds for the active account type'
                 )
 
             timestampSeconds = orderModel.timestampSeconds or int(time.time())
@@ -865,7 +909,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
 
             tx = sdk.Contract(builder)
-            seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
+            seedsByte = bytes.fromhex(str(signing_seeds).removeprefix('0x') )
             signerSeed = sdk.ZkLinkSigner().new_from_seed(seedsByte)
             auth_data = signerSeed.sign_musig(tx.get_bytes())
             signature = auth_data.signature
@@ -1026,3 +1070,130 @@ class HttpPrivateSign(HttpPrivate_v3):
             endpoint=path,
             data= {'orders':json.dumps(createOrders)}
         )
+
+
+class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
+    """
+    Convenience client whose default signing context targets the stock account.
+    """
+
+    def __init__(self, *args, stock_prefix=None, **kwargs):
+        super().__init__(*args, stock_prefix=stock_prefix, **kwargs)
+        # Auto-register stock account and cache stock API credentials if missing.
+        try:
+            # Register stock account (idempotent on server).
+            self.register_stock_account_v3()
+            creds = self._get_api_credentials(self.stock_account_type)
+            if not creds:
+                stock_account = self.get_account_v3_stock() or {}
+                account_id = stock_account.get('stockAccountId') or stock_account.get('id')
+                primary_account = self.get_account_v3() or {}
+                eth_address = primary_account.get('ethereumAddress')
+                chain_id = getattr(self, "network_id", None)
+                self.generate_stock_api_v3(
+                    wallet_name="Auto Stock Wallet",
+                    account_id=account_id,
+                    eth_address=eth_address,
+                    chain_id=chain_id,
+                )
+        except Exception:
+            # Do not block client construction if auto-generation fails.
+            pass
+
+    def use_primary_account(self):
+        """
+        Switch signing back to the primary V3 account.
+        """
+        self.set_default_account_type("primary")
+        primary_credentials = self._get_api_credentials("primary")
+        if primary_credentials:
+            self.api_key_credentials = primary_credentials
+
+    def transfer_contract_to_stock_v3(
+            self,
+            amount,
+            token,
+            clientId=None,
+            timestampSeconds=None,
+    ):
+        """
+        Convenience wrapper for contract -> stock transfer using primary API identity.
+        Only amount/token are required; stock receiver info comes from cached stock account.
+        """
+        if not self.configV3:
+            self.configs_v3()
+        previous_account_type = getattr(self, "_default_account_type", "primary")
+        self.use_primary_account()
+        try:
+            primary_account = self.get_account_v3(account_type="primary") or {}
+            stock_account = self.get_account_v3_stock() or {}
+            receiver_account_id = stock_account.get('stockAccountId') or stock_account.get('id')
+            receiver_l2_key = (
+                stock_account.get('l2Key')
+                or stock_account.get('omniSwapAccount', {}).get('l2Key')
+            )
+            receiver_address = stock_account.get('ethereumAddress') or primary_account.get('ethereumAddress')
+            if not receiver_account_id or not receiver_l2_key or not receiver_address:
+                raise ValueError('Stock account context is missing receiver details')
+            return self.create_contract_transfer_to_address_v3(
+                amount=amount,
+                asset=token,
+                receiverAccountId=receiver_account_id,
+                receiverL2Key=receiver_l2_key,
+                receiverAddress=receiver_address,
+                clientId=clientId,
+                timestampSeconds=timestampSeconds,
+            )
+        finally:
+            self.set_default_account_type(previous_account_type)
+
+    def transfer_stock_to_contract_v3(
+            self,
+            amount,
+            token,
+            clientId=None,
+            timestampSeconds=None,
+    ):
+        """
+        Convenience wrapper for stock -> contract transfer using stock API identity.
+        Only amount/token are required; contract receiver info comes from cached primary account.
+        """
+        if not self.configV3:
+            self.configs_v3()
+        previous_account_type = getattr(self, "_default_account_type", "primary")
+        self.set_default_account_type(self.stock_account_type)
+        stock_credentials = self._get_api_credentials(self.stock_account_type)
+        if stock_credentials:
+            self.api_key_credentials = stock_credentials
+        # Ensure signing context uses stock account snapshot.
+        stock_account = self.get_account_v3_stock() or {}
+        current_account_ctx = getattr(self, "accountV3", None)
+        if stock_account:
+            self._set_account_context(stock_account, account_type=self.stock_account_type)
+            self.accountV3 = stock_account
+        stock_account_id = stock_account.get('stockAccountId') or stock_account.get('id')
+        try:
+            primary_account = self.get_account_v3(account_type="primary") or {}
+            contract_receiver_id = primary_account.get('id')
+            contract_receiver_l2_key = (
+                primary_account.get('l2Key')
+                or primary_account.get('contractAccount', {}).get('l2Key')
+            )
+            contract_receiver_address = primary_account.get('ethereumAddress')
+            if not contract_receiver_id or not contract_receiver_l2_key or not contract_receiver_address:
+                raise ValueError('Primary account context is missing receiver details')
+            return self.create_contract_transfer_to_address_v3(
+                amount=amount,
+                asset=token,
+                receiverAccountId=contract_receiver_id,
+                receiverL2Key=contract_receiver_l2_key,
+                receiverAddress=contract_receiver_address,
+                clientId=clientId,
+                timestampSeconds=timestampSeconds,
+                accountId=stock_account_id,
+            )
+        finally:
+            # Restore previous account context.
+            if current_account_ctx is not None:
+                self.accountV3 = current_account_ctx
+            self.set_default_account_type(previous_account_type)
