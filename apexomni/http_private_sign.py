@@ -371,7 +371,7 @@ class HttpPrivateSign(HttpPrivate_v3):
 
         builder = sdk.WithdrawBuilder(
             int(zkAccountId),  int(subAccountId), int(toChainId),ethAddress, int(l2SourceTokenId),
-            int(l1TargetTokenId), amountStr.__str__(), None, '0', int(nonce),  int(withdraw_fee_ratio),  False, int(timestampSeconds)
+            int(l1TargetTokenId), amountStr.__str__(), None, fee, int(nonce),  int(withdraw_fee_ratio),  False, int(timestampSeconds)
         )
         tx = sdk.Withdraw(builder)
         seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
