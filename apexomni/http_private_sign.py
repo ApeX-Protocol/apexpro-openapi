@@ -356,22 +356,28 @@ class HttpPrivateSign(HttpPrivate_v3):
             if v.get('token') == asset:
                 currency = v
 
+        if not currency:
+            raise Exception(f"Asset config not found for token {asset}")
+
+        decimals = decimal.Decimal(currency.get('decimals'))
+        scale = decimal.Decimal(10) ** decimals
+
         l2SourceTokenId = l2SourceTokenId or currency.get('tokenId')
         l1TargetTokenId = l1TargetTokenId or currency.get('tokenId')
 
-        withdraw_fee_ratio = 0
-        if isFastWithdraw == True:
-            withdraw_fee_ratio = decimal.Decimal(fee) * decimal.Decimal(10000) / decimal.Decimal(amount)
-            withdraw_fee_ratio = withdraw_fee_ratio.quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
-            fee = (withdraw_fee_ratio * decimal.Decimal(amount) / 10000).__str__()
+        withdraw_fee_ratio = decimal.Decimal(0)
+        amount_dec = decimal.Decimal(amount)
+        fee_dec = decimal.Decimal(fee)
 
+        if isFastWithdraw is True:
+            withdraw_fee_ratio = (fee_dec * decimal.Decimal(10000) / amount_dec).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
 
-        amountStr = (decimal.Decimal(amount) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
-        #feeStr = (decimal.Decimal(fee) * decimal.Decimal(10) ** decimal.Decimal(currency.get('decimals'))).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+        amountStr = (amount_dec * scale).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+        feeStr = (fee_dec * scale).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
 
         builder = sdk.WithdrawBuilder(
-            int(zkAccountId),  int(subAccountId), int(toChainId),ethAddress, int(l2SourceTokenId),
-            int(l1TargetTokenId), amountStr.__str__(), None, fee, int(nonce),  int(withdraw_fee_ratio),  False, int(timestampSeconds)
+            int(zkAccountId),  int(subAccountId), int(toChainId), ethAddress, int(l2SourceTokenId),
+            int(l1TargetTokenId), amountStr.__str__(), None, feeStr.__str__(), int(nonce), int(withdraw_fee_ratio), False, int(timestampSeconds)
         )
         tx = sdk.Withdraw(builder)
         seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )

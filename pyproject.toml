@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "apexomni"
-version = "3.1.2"
+version = "3.1.6"
 description = "Python3 Apexpro omni HTTP/WebSocket API Connector"
 authors = [
     {name = "Dexter Dickinson", email = "xxx@apexomni.com"}
@@ -23,6 +23,23 @@ classifiers = [
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
+]
+dependencies = [
+    "requests",
+    "websocket-client",
+    "websockets",
+    "dateparser==1.0.0",
+    "ecdsa==0.16.0",
+    "eth_keys",
+    "eth-account==0.13.7",
+    "mpmath==1.0.0",
+    "pytest>=4.4.0,<5.0.0",
+    "requests-mock==1.6.0",
+    "requests>=2.32.3,<3.0.0",
+    "setuptools>=50.3.2",
+    "sympy==1.6",
+    "tox==3.13.2",
+    "web3==6.0.0",
 ]
 
 [tool.pytest.ini_options]
