@@ -375,9 +375,11 @@ class HttpPrivateSign(HttpPrivate_v3):
         amountStr = (amount_dec * scale).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
         feeStr = (fee_dec * scale).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
 
+        fee_for_builder = "0" if isFastWithdraw else feeStr.__str__()
+
         builder = sdk.WithdrawBuilder(
             int(zkAccountId),  int(subAccountId), int(toChainId), ethAddress, int(l2SourceTokenId),
-            int(l1TargetTokenId), amountStr.__str__(), None, feeStr.__str__(), int(nonce), int(withdraw_fee_ratio), False, int(timestampSeconds)
+            int(l1TargetTokenId), amountStr.__str__(), None, fee_for_builder, int(nonce), int(withdraw_fee_ratio), False, int(timestampSeconds)
         )
         tx = sdk.Withdraw(builder)
         seedsByte = bytes.fromhex(self.zk_seeds.removeprefix('0x') )
