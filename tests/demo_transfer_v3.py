@@ -36,28 +36,36 @@ accountData = client.get_account_v3()
 #createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=3)
 #print(createWithdrawRes)
 
-#smple2 fast withdraw
-#withdraw_feeRes = client.withdraw_fee_v3(amount="3",chainIds="3",tokenId='140')
-#print(withdraw_feeRes)
-#createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=3, fee=withdraw_feeRes.get('data').get('withdrawFeeAndPoolBalances')[0].get('fee'), isFastWithdraw=True)
+#smple2 query withdraw fee
+#withdrawFeeRes = client.withdraw_fee_v3(amount="3", chainIds="9", tokenId='60141')
+#print(withdrawFeeRes)
+
+#smple3 fast withdraw
+# create_withdrawal_v3 auto-fetches fee from withdraw_fee_v3.
+# For fast withdraw: request fee uses withdraw_fee_v3.fee; signing fee is 0.
+#createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=9, isFastWithdraw=True)
 #print(createWithdrawRes)
 
-#smple3 transfer_out,  from fund account to contract account
+#smple3-1 normal withdraw
+# create_withdrawal_v3 auto-uses withdraw_fee_v3.normalWithdrawFee.
+#createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=9, isFastWithdraw=False)
+#print(createWithdrawRes)
+#smple4 transfer_out,  from fund account to contract account
 #createTransferRes = client.create_transfer_out_v3(amount='3.4359738368',asset='USDT')
 #print(createTransferRes)
 
 #createTransferRes = client.create_transfer_out_v3(amount='0.01',asset='ETH')
 #print(createTransferRes)
 
-#smple4 contract transfer_out, from contract account to fund account
+#smple5 contract transfer_out, from contract account to fund account
 #createContractTransferRes = client.create_contract_transfer_out_v3(amount='0.005',asset='ETH')
 #print(createContractTransferRes)
 
-#smple5 contract contract_transfer_to_address,   from one contract account to another contract account
+#smple6 contract contract_transfer_to_address,   from one contract account to another contract account
 #createContractTransferRes = client.create_contract_transfer_to_address_v3(amount='1.1',asset='USDT',receiverAddress='0xfab6256aeef3be7805d3138be8fe1369f716ebc5',receiverAccountId='585750146675900485',receiverL2Key='0x04a234f299958150707451f649208fd085680bf3e1be432acb533eb2cc06082a')
 #print(createContractTransferRes)
 
-#smple6 manual-create-repayment
+#smple7 manual-create-repayment
 
 #clientId = random_client_id()
 #repaymentPriceRes = client.get_repayment_price_v3(repaymentPriceTokens='ETH|0.001', clientId=clientId)
@@ -68,5 +76,3 @@ accountData = client.get_account_v3()
 #print(repaymentRes)
 
 print("end, apexomni")
-
-

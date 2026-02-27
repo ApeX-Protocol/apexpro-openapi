@@ -311,7 +311,6 @@ class HttpPrivateSign(HttpPrivate_v3):
                           l1TargetTokenId=None,
                           zkAccountId=None,
                           subAccountId=None,
-                          fee='0',
                           clientId=None,
                           timestampSeconds=None,
                           ethAddress=None,
@@ -364,13 +363,66 @@ class HttpPrivateSign(HttpPrivate_v3):
 
         l2SourceTokenId = l2SourceTokenId or currency.get('tokenId')
         l1TargetTokenId = l1TargetTokenId or currency.get('tokenId')
+        to_chain_id_str = str(toChainId)
+        token_id_str = str(l1TargetTokenId)
 
         withdraw_fee_ratio = decimal.Decimal(0)
         amount_dec = decimal.Decimal(amount)
-        fee_dec = decimal.Decimal(fee)
+        if amount_dec <= 0:
+            raise Exception("amount must be greater than 0")
+        fee_dec = decimal.Decimal(0)
+        min_tick = decimal.Decimal(1) / scale
 
         if isFastWithdraw is True:
+            withdraw_fee_res = self.withdraw_fee_v3(
+                amount=str(amount),
+                chainIds=str(toChainId),
+                tokenId=str(l1TargetTokenId),
+            )
+            fee_entries = withdraw_fee_res.get('data', {}).get('withdrawFeeAndPoolBalances', [])
+            matched_entry = next(
+                (
+                    item for item in fee_entries
+                    if str(item.get('chainId', to_chain_id_str)) == to_chain_id_str
+                    and str(item.get('tokenId', token_id_str)) == token_id_str
+                ),
+                fee_entries[0] if fee_entries else None
+            )
+            if not matched_entry or matched_entry.get('fee') is None:
+                raise Exception("Failed to get fast withdraw fee from withdraw_fee_v3")
+
+            fee_dec = decimal.Decimal(str(matched_entry.get('fee')))
             withdraw_fee_ratio = (fee_dec * decimal.Decimal(10000) / amount_dec).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
+            if withdraw_fee_ratio <= 0:
+                raise Exception(f"Invalid fast withdraw fee ratio from withdraw_fee_v3, fee={fee_dec}, chainId={to_chain_id_str}, tokenId={token_id_str}")
+            fee_dec = (amount_dec * withdraw_fee_ratio / decimal.Decimal(10000)).quantize(min_tick, rounding=decimal.ROUND_UP)
+        else:
+            withdraw_fee_res = self.withdraw_fee_v3(
+                amount=str(amount),
+                chainIds=str(toChainId),
+                tokenId=str(l1TargetTokenId),
+            )
+            fee_entries = withdraw_fee_res.get('data', {}).get('withdrawFeeAndPoolBalances', [])
+            matched_entry = next(
+                (
+                    item for item in fee_entries
+                    if str(item.get('chainId', to_chain_id_str)) == to_chain_id_str
+                    and str(item.get('tokenId', token_id_str)) == token_id_str
+                ),
+                fee_entries[0] if fee_entries else None
+            )
+            if not matched_entry or matched_entry.get('normalWithdrawFee') is None:
+                raise Exception("Failed to get normalWithdrawFee from withdraw_fee_v3")
+
+            normal_fee_dec = decimal.Decimal(str(matched_entry.get('normalWithdrawFee')))
+            fee_dec = normal_fee_dec.quantize(min_tick, rounding=decimal.ROUND_DOWN)
+
+        fee = format(fee_dec.normalize(), 'f')
+        if '.' in fee:
+            fee = fee.rstrip('0').rstrip('.')
+        if not fee:
+            fee = '0'
+        request_fee = fee
 
         amountStr = (amount_dec * scale).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
         feeStr = (fee_dec * scale).quantize(decimal.Decimal(0), rounding=decimal.ROUND_UP)
@@ -397,7 +449,7 @@ class HttpPrivateSign(HttpPrivate_v3):
             'zkAccountId': zkAccountId,
             'subAccountId': subAccountId,
             'l2Key': l2Key,
-            'fee': str(fee),
+            'fee': request_fee,
             'toChainId': toChainId,
             'l2SourceTokenId': l2SourceTokenId,
             'l1TargetTokenId': l1TargetTokenId,

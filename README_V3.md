@@ -209,7 +209,14 @@ accountData = client.get_account_v3()
 #smple2 fast withdraw
 #withdraw_feeRes = client.withdraw_fee_v3(amount="3",chainIds="3",tokenId='140')
 #print(withdraw_feeRes)
-#createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=3, fee=withdraw_feeRes.get('data').get('withdrawFeeAndPoolBalances')[0].get('fee'), isFastWithdraw=True)
+# create_withdrawal_v3 auto-fetches fee from withdraw_fee_v3.
+# For fast withdraw: request fee uses withdraw_fee_v3.fee; signing fee is 0.
+#createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=3, isFastWithdraw=True)
+#print(createWithdrawRes)
+
+#smple2-1 normal withdraw
+# create_withdrawal_v3 auto-uses withdraw_fee_v3.normalWithdrawFee.
+#createWithdrawRes = client.create_withdrawal_v3(amount='3',asset='USDT', toChainId=3, isFastWithdraw=False)
 #print(createWithdrawRes)
 
 #smple3 transfer_out
@@ -329,4 +336,3 @@ ws_client.account_info_stream_v3(handle_account)
 while True:
     # Run your main trading logic here.
     sleep(1)
-
