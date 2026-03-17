@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "apexomni"
-version = "3.1.8"
+version = "3.2.0"
 description = "Python3 Apexpro omni HTTP/WebSocket API Connector"
 authors = [
     {name = "Dexter Dickinson", email = "xxx@apexomni.com"}
