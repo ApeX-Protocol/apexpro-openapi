@@ -9,7 +9,7 @@ with open(path.join(here, 'README.md'), encoding='utf-8') as f:
 
 
 setup(
-    name='apexomni-x86-mac',
+    name='apexomni',
     version='3.2.0',
     packages=find_packages(),
     description='Python3 Apexpro omni HTTP/WebSocket API Connector',
@@ -34,7 +34,6 @@ setup(
     ],
     keywords='apexomni apexpro api connector',
     package_data={'': ['*.json','*.dylib','*.dll','*.so']},
-    data_files=[('apexpro', ['apexpro/starkex/starkex_resources/pedersen_params.json', 'apexpro/libzklink_sdk.dylib'])],
     # packages=['apexpro'],
     python_requires='>=3.6',
     install_requires=[
