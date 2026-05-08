@@ -1,5 +1,6 @@
 import decimal
 import hashlib
+import logging
 import time
 
 import numpy as np
@@ -1157,8 +1158,11 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
                     chain_id=chain_id,
                 )
         except Exception:
-            # Do not block client construction if auto-generation fails.
-            pass
+            logging.warning(
+                "HttpPrivateStockSign: auto stock account setup failed, "
+                "stock operations may not work until credentials are configured manually",
+                exc_info=True,
+            )
 
     def use_primary_account(self):
         """
