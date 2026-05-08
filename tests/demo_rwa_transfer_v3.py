@@ -2,7 +2,7 @@ import sys
 
 from apexomni.constants import APEX_OMNI_HTTP_TEST, NETWORKID_OMNI_TEST_BNB
 from apexomni.helpers.request_helpers import random_client_id
-from apexomni.http_private_sign import HttpPrivateStockSign
+from apexomni.http_private_sign import HttpPrivateRwaSign
 
 # Replace these with your own credentials/seeds before running the demo.
 primary_credentials = {
@@ -14,8 +14,8 @@ seeds = 'your zk seeds from register'
 l2Key = 'your l2Key seeds from register'
 
 def main():
-    print("Hello, Apex Omni stock transfer demo")
-    client = HttpPrivateStockSign(
+    print("Hello, Apex Omni RWA transfer demo")
+    client = HttpPrivateRwaSign(
         APEX_OMNI_HTTP_TEST,
         network_id=NETWORKID_OMNI_TEST_BNB,
         zk_seeds=seeds,
@@ -26,26 +26,26 @@ def main():
     # Cache configs and both account contexts.
     client.configs_v3()
     primary_account = client.get_account_v3(account_type="primary") or {}
-    stock_account = client.get_account_v3_stock() or {}
+    rwa_account = client.get_account_v3_rwa() or {}
 
-    # Contract -> stock transfer (uses primary API identity; stock details pulled from cache).
-    contract_to_stock = client.transfer_contract_to_stock_v3(
+    # Contract -> RWA transfer (uses primary API identity; RWA details pulled from cache).
+    contract_to_rwa = client.transfer_contract_to_rwa_v3(
         amount="1",  # replace with the amount to transfer
         token="USDT",
         clientId=random_client_id(),
     )
-    print("Contract -> stock transfer response:", contract_to_stock)
+    print("Contract -> RWA transfer response:", contract_to_rwa)
 
-    # Stock -> contract transfer using the same /api/v3/contract-transfer-to
-    # endpoint. Uses stock API identity; contract details pulled from primary cache.
-    stock_to_contract = client.transfer_stock_to_contract_v3(
+    # RWA -> contract transfer using the same /api/v3/contract-transfer-to
+    # endpoint. Uses RWA API identity; contract details pulled from primary cache.
+    rwa_to_contract = client.transfer_rwa_to_contract_v3(
         amount="1",  # replace with the amount to transfer
         token="USDT",
         clientId=random_client_id(),
     )
-    print("Stock -> contract transfer response:", stock_to_contract)
+    print("RWA -> contract transfer response:", rwa_to_contract)
 
-    print("end, Apex Omni stock transfer demo")
+    print("end, Apex Omni RWA transfer demo")
 
 
 if __name__ == "__main__":

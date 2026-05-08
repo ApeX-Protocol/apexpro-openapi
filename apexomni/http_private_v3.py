@@ -261,82 +261,82 @@ class HttpPrivate_v3(HttpPrivate):
         )
 
 
-class HttpPrivateStock_v3(HttpPrivate_v3):
+class HttpPrivateRwa_v3(HttpPrivate_v3):
     """
-    Specialized V3 client for U.S. stock sub-accounts.
-    Reuses core V3 flows but signs requests with the stock API key set.
+    Specialized V3 client for RWA sub-accounts.
+    Reuses core V3 flows but signs requests with the RWA API key set.
     """
 
-    STOCK_ACCOUNT_TYPE = "stock"
-    DEFAULT_STOCK_PREFIX = URL_SUFFIX + "/v3/stock"
+    RWA_ACCOUNT_TYPE = "rwa"
+    DEFAULT_RWA_PREFIX = URL_SUFFIX + "/v3/stock"
 
-    def __init__(self, *args, stock_prefix=None, default_to_stock=True, **kwargs):
+    def __init__(self, *args, rwa_prefix=None, default_to_rwa=True, **kwargs):
         super().__init__(*args, **kwargs)
-        self.stock_account_type = self.STOCK_ACCOUNT_TYPE
-        self.stock_prefix = stock_prefix or self.DEFAULT_STOCK_PREFIX
-        if default_to_stock:
-            self.set_default_account_type(self.stock_account_type)
+        self.rwa_account_type = self.RWA_ACCOUNT_TYPE
+        self.rwa_prefix = rwa_prefix or self.DEFAULT_RWA_PREFIX
+        if default_to_rwa:
+            self.set_default_account_type(self.rwa_account_type)
 
-    def set_stock_api_credentials(self, credentials):
+    def set_rwa_api_credentials(self, credentials):
         """
-        Register API key credentials for the stock account.
+        Register API key credentials for the RWA account.
         """
-        self._set_api_key_credentials(credentials, account_type=self.stock_account_type)
-        if getattr(self, "_default_account_type", "primary") == self.stock_account_type:
+        self._set_api_key_credentials(credentials, account_type=self.rwa_account_type)
+        if getattr(self, "_default_account_type", "primary") == self.rwa_account_type:
             self.api_key_credentials = credentials
 
-    def _stock_path(self, suffix):
+    def _rwa_path(self, suffix):
         if suffix.startswith("/"):
-            return f"{self.stock_prefix}{suffix}"
-        return f"{self.stock_prefix}/{suffix}"
+            return f"{self.rwa_prefix}{suffix}"
+        return f"{self.rwa_prefix}/{suffix}"
 
     def _get_api_credentials(self, account_type="primary"):
         """
-        For stock requests, prefer stock creds; if absent (e.g., generating stock API),
+        For RWA requests, prefer RWA creds; if absent (e.g., generating RWA API),
         fall back to primary. Otherwise default behaviour.
         """
         credentials_map = self._get_api_key_credentials_map()
-        if account_type == self.stock_account_type:
-            return credentials_map.get(self.stock_account_type)
+        if account_type == self.rwa_account_type:
+            return credentials_map.get(self.rwa_account_type)
         return credentials_map.get(account_type) or credentials_map.get("primary")
 
-    def get_account_v3_stock(self, **kwargs):
+    def get_account_v3_rwa(self, **kwargs):
         """
-        Retrieve stock sub-account data and cache it for later signing.
+        Retrieve RWA sub-account data and cache it for later signing.
         """
-        path = self._stock_path("/account")
+        path = self._rwa_path("/account")
         accountRes = self._get(
             endpoint=path,
             params=kwargs,
-            account_type=self.stock_account_type,
+            account_type=self.rwa_account_type,
         )
         data = accountRes.get('data') if isinstance(accountRes, dict) else None
         if data is not None:
             contract_account = data.get('contractAccount') or {}
             sub_accounts = contract_account.get('subAccountInfo') or []
-            stock_sub = next(
+            rwa_sub = next(
                 (s for s in sub_accounts if s.get('accountType') == 'SUB_STOCK_ACCOUNT'),
                 None,
             )
-            if stock_sub:
-                # Promote stock sub-account id for downstream signing/API calls.
+            if rwa_sub:
+                # Promote RWA sub-account id for downstream signing/API calls.
                 data = dict(data)
-                stock_account_id = stock_sub.get('accountId')
-                data['stockAccountId'] = stock_account_id
-                data['subAccountId'] = stock_account_id or data.get('subAccountId')
-                data['id'] = stock_account_id or data.get('id')
+                rwa_account_id = rwa_sub.get('accountId')
+                data['stockAccountId'] = rwa_account_id
+                data['subAccountId'] = rwa_account_id or data.get('subAccountId')
+                data['id'] = rwa_account_id or data.get('id')
                 # Flatten contract account for convenience
                 data['contractAccount'] = contract_account
                 data['spotAccount'] = data.get('spotAccount') or {}
             # Preserve cached l2Key (derived_pubkey) if the API payload omits it.
-            cached_stock_ctx = self._get_account_context(self.stock_account_type) or {}
+            cached_rwa_ctx = self._get_account_context(self.rwa_account_type) or {}
             cached_l2_key = (
                 data.get('omniSwapAccount', {}).get('l2Key')
-                or cached_stock_ctx.get('l2Key')
+                or cached_rwa_ctx.get('l2Key')
             )
             if cached_l2_key and not data.get('l2Key'):
                 data['l2Key'] = cached_l2_key
-            self._set_account_context(data, account_type=self.stock_account_type)
+            self._set_account_context(data, account_type=self.rwa_account_type)
         return data
 
     def _resolve_primary_account(self):
@@ -347,12 +347,12 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
             raise ValueError('Primary account context is required')
         return account
 
-    def _derive_stock_seed(self, master_seed_hex):
+    def _derive_rwa_seed(self, master_seed_hex):
         """
-        Derive a deterministic stock seed from the primary seed (mirrors web generateStockSeed).
+        Derive a deterministic RWA seed from the primary seed (mirrors web generateStockSeed).
         """
         if not master_seed_hex:
-            raise ValueError('Primary seed is required to derive stock seed')
+            raise ValueError('Primary seed is required to derive RWA seed')
         clean_master = master_seed_hex.removeprefix('0x')
         try:
             master_seed_bytes = bytes.fromhex(clean_master)
@@ -377,36 +377,36 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
         v = '1b'
         return f"0x{r}{s}{v}"
 
-    def _build_stock_registration_signature(self, master_account, master_l2_key):
+    def _build_rwa_registration_signature(self, master_account, master_l2_key):
         """
-        Stock registration follows web logic:
+        RWA registration follows web logic:
         - message uses the *master* l2Key
-        - signature and stock l2Key are produced by the stock seed signer
-        - the stock l2Key (signer pubkey) is what gets submitted in the request
+        - signature and RWA l2Key are produced by the RWA seed signer
+        - the RWA l2Key (signer pubkey) is what gets submitted in the request
         """
         if not master_l2_key:
-            raise ValueError('Master l2Key is required to build stock signature')
+            raise ValueError('Master l2Key is required to build RWA signature')
         l2_key_str = master_l2_key if isinstance(master_l2_key, str) else str(master_l2_key)
         sign_msg = f"Register stock account, main account l2key {l2_key_str}"
         seeds = self.zk_seeds
         if not seeds:
-            raise ValueError('zk seeds required to sign stock registration')
-        stock_seed_hex = self._derive_stock_seed(seeds)
-        stock_seed_bytes = bytes.fromhex(stock_seed_hex.removeprefix('0x'))
-        stock_signer = sdk.ZkLinkSigner.new_from_seed(stock_seed_bytes)
-        # Mirror web stock signing: hash message, reduce by EC order, then sign
+            raise ValueError('zk seeds required to sign RWA registration')
+        rwa_seed_hex = self._derive_rwa_seed(seeds)
+        rwa_seed_bytes = bytes.fromhex(rwa_seed_hex.removeprefix('0x'))
+        rwa_signer = sdk.ZkLinkSigner.new_from_seed(rwa_seed_bytes)
+        # Mirror web signing: hash message, reduce by EC order, then sign
         # the reduced value to stay within the signer bit-length limit.
         message_hash_hex = hashlib.sha256(sign_msg.encode()).hexdigest()
         ec_order = int('3618502788666131213697322783095070105526743751716087489154079457884512865583')
         data_bn = int(message_hash_hex, 16)
         data_mod_hex = hex(data_bn % ec_order).removeprefix('0x')
-        signature = stock_signer.sign_musig(data_mod_hex.encode()).signature
-        stock_pubkey = stock_signer.public_key()
-        return signature, stock_pubkey
+        signature = rwa_signer.sign_musig(data_mod_hex.encode()).signature
+        rwa_pubkey = rwa_signer.public_key()
+        return signature, rwa_pubkey
 
-    def _build_stock_api_signature_with_nonce(self, l2_key, eth_address, chain_id=None):
+    def _build_rwa_api_signature_with_nonce(self, l2_key, eth_address, chain_id=None):
         """
-        Generate signature for stock generate-api using nonce flow (web aligned).
+        Generate signature for RWA generate-api using nonce flow (web aligned).
         """
         if not eth_address:
             raise ValueError('eth_address is required for api signature')
@@ -414,13 +414,13 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
         if chain_id is None:
             raise ValueError('chain_id is required for api signature')
 
-        stock_seed_hex = self._derive_stock_seed(self.zk_seeds)
-        self.stock_zk_seeds = stock_seed_hex
-        stock_seed_bytes = bytes.fromhex(stock_seed_hex.removeprefix('0x'))
-        signer = sdk.ZkLinkSigner.new_from_seed(stock_seed_bytes)
+        rwa_seed_hex = self._derive_rwa_seed(self.zk_seeds)
+        self.rwa_zk_seeds = rwa_seed_hex
+        rwa_seed_bytes = bytes.fromhex(rwa_seed_hex.removeprefix('0x'))
+        signer = sdk.ZkLinkSigner.new_from_seed(rwa_seed_bytes)
         pub_key = signer.public_key()
 
-        # Retrieve nonce using derived stock pubkey
+        # Retrieve nonce using derived RWA pubkey
         nonce_res = self.generate_nonce_v3(
             l2Key=str(pub_key).removeprefix('0x').lower(),
             ethAddress=eth_address,
@@ -430,7 +430,7 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
         if isinstance(nonce_res, dict):
             nonce = nonce_res.get('data', {}).get('nonce') or nonce_res.get('nonce')
         if nonce is None:
-            raise ValueError('nonce is required for stock api signature')
+            raise ValueError('nonce is required for RWA api signature')
 
         message = f"{str(pub_key).removeprefix('0x')}{eth_address}{nonce}".lower()
         msg_hash = hashlib.sha256(message.encode()).hexdigest()
@@ -440,12 +440,12 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
         signature = signer.sign_musig(data_mod_hex.encode()).signature
         return signature, pub_key
 
-    def register_stock_account_v3(
+    def register_rwa_account_v3(
             self,
             l2Key=None,
     ):
         """
-        Register a stock sub-account for the current user.
+        Register a RWA sub-account for the current user.
         The master account and signature are derived automatically.
         """
         master_l2_key = l2Key or self.zk_l2Key
@@ -455,12 +455,12 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
         master_account = self._resolve_primary_account()
         master_account_id = master_account.get('id')
         if not master_account_id:
-            raise ValueError('Primary account id required for stock registration')
+            raise ValueError('Primary account id required for RWA registration')
 
-        signature, stock_pubkey = self._build_stock_registration_signature(master_account, master_l2_key)
-        l2_key_payload = stock_pubkey if isinstance(stock_pubkey, str) else str(stock_pubkey)
+        signature, rwa_pubkey = self._build_rwa_registration_signature(master_account, master_l2_key)
+        l2_key_payload = rwa_pubkey if isinstance(rwa_pubkey, str) else str(rwa_pubkey)
 
-        path = self._stock_path("/register-account")
+        path = self._rwa_path("/register-account")
         register_res = self._post(
             endpoint=path,
             data={
@@ -473,45 +473,45 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
 
         data = register_res.get('data') if isinstance(register_res, dict) else None
         if data:
-            stock_account = data.get('stockAccount') or {}
-            if stock_account:
-                # Promote stock account context
+            rwa_account = data.get('stockAccount') or {}
+            if rwa_account:
+                # Promote RWA account context
                 account_ctx = {
-                    'id': stock_account.get('accountId'),
-                    'stockAccountId': stock_account.get('accountId'),
-                    'accountType': stock_account.get('accountType'),
+                    'id': rwa_account.get('accountId'),
+                    'stockAccountId': rwa_account.get('accountId'),
+                    'accountType': rwa_account.get('accountType'),
                 }
-                self._set_account_context(account_ctx, account_type=self.stock_account_type)
+                self._set_account_context(account_ctx, account_type=self.rwa_account_type)
         return register_res
 
-    def generate_stock_api_v3(self, wallet_name, account_id=None, eth_address=None, chain_id=None, l2Key=None, signature=None):
+    def generate_rwa_api_v3(self, wallet_name, account_id=None, eth_address=None, chain_id=None, l2Key=None, signature=None):
         """
-        Generate a trading API for the stock account using the stock-specific endpoint.
+        Generate a trading API for the RWA account using the RWA-specific endpoint.
         """
-        # Prefer caller-provided stock l2Key; otherwise take the stock account context.
-        stock_account = self._get_account_context(self.stock_account_type) or {}
-        l2_key = l2Key or stock_account.get('l2Key') or self.zk_l2Key
+        # Prefer caller-provided RWA l2Key; otherwise take the RWA account context.
+        rwa_account = self._get_account_context(self.rwa_account_type) or {}
+        l2_key = l2Key or rwa_account.get('l2Key') or self.zk_l2Key
 
         if l2_key is None:
-            raise ValueError('stock zk l2Key is required')
+            raise ValueError('RWA zk l2Key is required')
         if wallet_name is None:
             raise ValueError('wallet_name is required')
         if account_id is None:
-            account_id = stock_account.get('id')
+            account_id = rwa_account.get('id')
         if account_id is None:
-            raise ValueError('stock account_id is required')
+            raise ValueError('RWA account_id is required')
         if eth_address is None:
             raise ValueError('eth_address is required')
         derived_pubkey = None
         if signature is None:
             chain_id = chain_id or getattr(self, "network_id", None)
             if chain_id is None:
-                raise ValueError('chain_id is required to build stock api signature')
-            # Build signature using stock seed + nonce flow.
-            signature, derived_pubkey = self._build_stock_api_signature_with_nonce(l2_key, eth_address, chain_id)
+                raise ValueError('chain_id is required to build RWA api signature')
+            # Build signature using RWA seed + nonce flow.
+            signature, derived_pubkey = self._build_rwa_api_signature_with_nonce(l2_key, eth_address, chain_id)
 
         l2_key_payload = derived_pubkey or l2_key
-        path = self._stock_path("/generate-api")
+        path = self._rwa_path("/generate-api")
         response = self._post(
             endpoint=path,
             data={
@@ -523,33 +523,33 @@ class HttpPrivateStock_v3(HttpPrivate_v3):
             },
             account_type="primary",
         )
-        # Cache derived stock seed even when caller supplies signature/l2Key
-        # so downstream stock signing uses the correct key.
-        if not getattr(self, "stock_zk_seeds", None) and self.zk_seeds:
+        # Cache derived RWA seed even when caller supplies signature/l2Key
+        # so downstream RWA signing uses the correct key.
+        if not getattr(self, "rwa_zk_seeds", None) and self.zk_seeds:
             try:
-                self.stock_zk_seeds = self._derive_stock_seed(self.zk_seeds)
+                self.rwa_zk_seeds = self._derive_rwa_seed(self.zk_seeds)
             except Exception:
-                # Do not block if derivation fails; caller may have provided stock seeds separately.
+                # Do not block if derivation fails; caller may have provided RWA seeds separately.
                 pass
         data = response.get('data') if isinstance(response, dict) else None
         if data:
-            stock_account = data.get('stockAccount') or {}
-            api_key_block = stock_account.get('apiKey') or data.get('apiKey')
-            if stock_account:
+            rwa_account = data.get('stockAccount') or {}
+            api_key_block = rwa_account.get('apiKey') or data.get('apiKey')
+            if rwa_account:
                 account_ctx = {
-                    'id': stock_account.get('accountId'),
-                    'stockAccountId': stock_account.get('accountId'),
-                    'accountType': stock_account.get('accountType'),
-                    'l2Key': derived_pubkey or stock_account.get('l2Key') or l2_key_payload,
+                    'id': rwa_account.get('accountId'),
+                    'stockAccountId': rwa_account.get('accountId'),
+                    'accountType': rwa_account.get('accountType'),
+                    'l2Key': derived_pubkey or rwa_account.get('l2Key') or l2_key_payload,
                 }
-                self._set_account_context(account_ctx, account_type=self.stock_account_type)
+                self._set_account_context(account_ctx, account_type=self.rwa_account_type)
             if api_key_block:
                 credentials = {
                     'key': api_key_block.get('key'),
                     'secret': api_key_block.get('secret'),
                     'passphrase': api_key_block.get('passphrase'),
                 }
-                self.set_stock_api_credentials(credentials)
+                self.set_rwa_api_credentials(credentials)
         return response
 
     def transfer_v3(self, **kwargs):

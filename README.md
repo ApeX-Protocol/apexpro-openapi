@@ -56,21 +56,21 @@ from apexomni.http_public import HttpPublic
 client = HttpPublic(APEX_OMNI_HTTP_TEST)
 ```
 
-### U.S. stock (stock) account quickstart
-- Stock endpoints use a separate stock sub-account, stock API key, and stock signing seed derived from the master seed.
-- Use `HttpPrivateStockSign` to auto-register the stock account and generate the stock API (falls back to primary creds if stock API is missing).
-- Stock requests default to the stock account context; switch back with `client.use_primary_account()` if needed.
+### RWA account quickstart
+- RWA endpoints use a separate RWA sub-account, RWA API key, and RWA signing seed derived from the master seed.
+- Use `HttpPrivateRwaSign` to auto-register the RWA account and generate the RWA API (falls back to primary creds if RWA API is missing).
+- RWA requests default to the RWA account context; switch back with `client.use_primary_account()` if needed.
 
 ```python
-from apexomni.http_private_sign import HttpPrivateStockSign
+from apexomni.http_private_sign import HttpPrivateRwaSign
 from apexomni.constants import APEX_OMNI_HTTP_TEST, NETWORKID_OMNI_TEST_BNB
 
-client = HttpPrivateStockSign(
+client = HttpPrivateRwaSign(
     APEX_OMNI_HTTP_TEST,
     network_id=NETWORKID_OMNI_TEST_BNB,
-    zk_seeds="your-master-seeds",          # primary seeds (stock seeds are derived automatically)
-    zk_l2Key="your-master-l2key",          # primary l2Key; stock l2Key is derived during generate-api
-    api_key_credentials={                  # primary API key; stock API is generated/cached
+    zk_seeds="your-master-seeds",          # primary seeds (RWA seeds are derived automatically)
+    zk_l2Key="your-master-l2key",          # primary l2Key; RWA l2Key is derived during generate-api
+    api_key_credentials={                  # primary API key; RWA API is generated/cached
         "key": "...",
         "secret": "...",
         "passphrase": "...",
@@ -80,18 +80,18 @@ client = HttpPrivateStockSign(
 # Ensure configs and account contexts are cached.
 client.configs_v3()
 client.get_account_v3(account_type="primary")
-client.get_account_v3_stock()
+client.get_account_v3_rwa()
 
-# Contract -> stock transfer (signs with primary API, stock receiver details from cache).
-client.transfer_contract_to_stock_v3(amount="1", token="USDT")
+# Contract -> RWA transfer (signs with primary API, RWA receiver details from cache).
+client.transfer_contract_to_rwa_v3(amount="1", token="USDT")
 
-# Stock -> contract transfer (signs with stock API/stock seeds, primary receiver details from cache).
-client.transfer_stock_to_contract_v3(amount="1", token="USDT")
+# RWA -> contract transfer (signs with RWA API/RWA seeds, primary receiver details from cache).
+client.transfer_rwa_to_contract_v3(amount="1", token="USDT")
 ```
 
 Key points:
-- Stock seeds (`stock_zk_seeds`) and stock l2Key are derived during `generate_stock_api_v3`; if you supply a custom signature/l2Key, the SDK still caches a derived stock seed from the master seed for later signing.
-- The SDK keeps separate API credential slots for `primary` and `stock`; signing uses the active account type’s seeds and API key.
+- RWA seeds (`rwa_zk_seeds`) and RWA l2Key are derived during `generate_rwa_api_v3`; if you supply a custom signature/l2Key, the SDK still caches a derived RWA seed from the master seed for later signing.
+- The SDK keeps separate API credential slots for `primary` and `rwa`; signing uses the active account type’s seeds and API key.
 
 ### Public endpoints V3
 

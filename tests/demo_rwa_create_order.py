@@ -1,7 +1,7 @@
 import sys
 import time
 
-from apexomni.http_private_sign import HttpPrivateStockSign
+from apexomni.http_private_sign import HttpPrivateRwaSign
 from apexomni.constants import (
     APEX_OMNI_HTTP_TEST,
     NETWORKID_OMNI_TEST_BNB,
@@ -9,7 +9,7 @@ from apexomni.constants import (
 from apexomni.helpers.util import round_size
 
 
-# Replace these with env vars; leave stock API blank to auto-generate via /stock/generate-api.
+# Replace these with env vars; leave RWA API blank to auto-generate via /stock/generate-api.
 primary_credentials = {
     'key': 'your apiKey-key from register V3',
     'secret': 'our apiKey-secret from register  V3',
@@ -20,8 +20,8 @@ l2Key = 'your l2Key seeds from register'
 
 
 def main():
-    print("Hello, Apex Omni Stock - place order demo")
-    client = HttpPrivateStockSign(
+    print("Hello, Apex Omni RWA - place order demo")
+    client = HttpPrivateRwaSign(
         APEX_OMNI_HTTP_TEST,
         network_id=NETWORKID_OMNI_TEST_BNB,
         zk_seeds=seeds,
@@ -37,7 +37,7 @@ def main():
 
     # Fetch symbol config to respect tick/step sizing if available.
     configs = client.configs_v3()
-    symbol = "AAPL-USDT"  # replace with an available stock symbol
+    symbol = "AAPL-USDT"  # replace with an available RWA symbol
     step_size = None
     tick_size = None
     for entry in configs.get('data', {}).get('symbolConfig', []):
@@ -62,9 +62,9 @@ def main():
         clientId=client_order_id,
         takerFeeRate="0.0005",
         makerFeeRate="0.0002",
-        account_type = "stock"
+        account_type = "rwa"
     )
-    print("Create stock order response:", order_res)
+    print("Create RWA order response:", order_res)
 
     # Example query order
     order = client.get_order_v3(id="781074154758603374")

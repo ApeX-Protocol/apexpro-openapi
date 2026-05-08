@@ -1,10 +1,10 @@
 
-from apexomni.http_private_sign import HttpPrivateStockSign
+from apexomni.http_private_sign import HttpPrivateRwaSign
 from apexomni.constants import (
     APEX_OMNI_HTTP_TEST, NETWORKID_OMNI_TEST_BNB,
 )
 
-print("Hello, Apex Omni Stock")
+print("Hello, Apex Omni RWA")
 
 primary_credentials = {
     'key': 'your apiKey-key from register V3',
@@ -14,7 +14,7 @@ primary_credentials = {
 seeds = 'your zk seeds from register'
 l2Key = 'your l2Key seeds from register'
 
-client = HttpPrivateStockSign(
+client = HttpPrivateRwaSign(
     APEX_OMNI_HTTP_TEST,
     network_id=NETWORKID_OMNI_TEST_BNB,
     zk_seeds=seeds,
@@ -22,22 +22,22 @@ client = HttpPrivateStockSign(
     api_key_credentials=primary_credentials,
 )
 
-# First register the stock account (if not already registered).
-register_res = client.register_stock_account_v3()
-print("Registered stock account:", register_res)
+# First register the RWA account (if not already registered).
+register_res = client.register_rwa_account_v3()
+print("Registered RWA account:", register_res)
 
-# Generate/refresh a stock-specific API credential set.
+# Generate/refresh a RWA-specific API credential set.
 wallet_name = "pythonSdk"
 primary_account = client.get_account_v3()
 eth_address = (primary_account or {}).get('ethereumAddress')
-generate_res = client.generate_stock_api_v3(
+generate_res = client.generate_rwa_api_v3(
     wallet_name=wallet_name,
     eth_address=eth_address,
 )
-print("Generated stock API:", generate_res)
+print("Generated RWA API:", generate_res)
 
-# After generation, the credentials are cached under the stock account type.
-stock_account = client.get_account_v3_stock() or {}
-print("Loaded stock account:", stock_account.get('id'))
+# After generation, the credentials are cached under the RWA account type.
+rwa_account = client.get_account_v3_rwa() or {}
+print("Loaded RWA account:", rwa_account.get('id'))
 
-print("end, Apex Omni Stock")
+print("end, Apex Omni RWA")

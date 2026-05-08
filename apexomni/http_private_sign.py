@@ -9,7 +9,7 @@ import json
 from apexomni import zklink_sdk as sdk
 from apexomni.constants import URL_SUFFIX, ORDER_SIDE_BUY
 from apexomni.helpers.request_helpers import random_client_id
-from apexomni.http_private_v3 import HttpPrivate_v3, HttpPrivateStock_v3
+from apexomni.http_private_v3 import HttpPrivate_v3, HttpPrivateRwa_v3
 from apexomni.starkex.order import DECIMAL_CONTEXT_ROUND_UP, DECIMAL_CONTEXT_ROUND_DOWN
 
 
@@ -22,11 +22,11 @@ class HttpPrivateSign(HttpPrivate_v3):
     def _resolve_signing_seeds(self, account_type=None):
         """
         Choose signing seeds based on the current account type.
-        Prefers cached stock seeds when signing under the stock account.
+        Prefers cached RWA seeds when signing under the RWA account.
         """
         account_type = account_type or getattr(self, "_default_account_type", "primary")
-        if account_type == getattr(self, "stock_account_type", None):
-            seeds = getattr(self, "stock_zk_seeds", None) or self.zk_seeds
+        if account_type == getattr(self, "rwa_account_type", None):
+            seeds = getattr(self, "rwa_zk_seeds", None) or self.zk_seeds
             if seeds:
                 return seeds
         return self.zk_seeds
@@ -1133,34 +1133,34 @@ class HttpPrivateSign(HttpPrivate_v3):
         )
 
 
-class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
+class HttpPrivateRwaSign(HttpPrivateRwa_v3, HttpPrivateSign):
     """
-    Convenience client whose default signing context targets the stock account.
+    Convenience client whose default signing context targets the RWA account.
     """
 
-    def __init__(self, *args, stock_prefix=None, **kwargs):
-        super().__init__(*args, stock_prefix=stock_prefix, **kwargs)
-        # Auto-register stock account and cache stock API credentials if missing.
+    def __init__(self, *args, rwa_prefix=None, **kwargs):
+        super().__init__(*args, rwa_prefix=rwa_prefix, **kwargs)
+        # Auto-register RWA account and cache RWA API credentials if missing.
         try:
-            # Register stock account (idempotent on server).
-            self.register_stock_account_v3()
-            creds = self._get_api_credentials(self.stock_account_type)
+            # Register RWA account (idempotent on server).
+            self.register_rwa_account_v3()
+            creds = self._get_api_credentials(self.rwa_account_type)
             if not creds:
-                stock_account = self.get_account_v3_stock() or {}
-                account_id = stock_account.get('stockAccountId') or stock_account.get('id')
+                rwa_account = self.get_account_v3_rwa() or {}
+                account_id = rwa_account.get('stockAccountId') or rwa_account.get('id')
                 primary_account = self.get_account_v3() or {}
                 eth_address = primary_account.get('ethereumAddress')
                 chain_id = getattr(self, "network_id", None)
-                self.generate_stock_api_v3(
-                    wallet_name="Auto Stock Wallet",
+                self.generate_rwa_api_v3(
+                    wallet_name="Auto RWA Wallet",
                     account_id=account_id,
                     eth_address=eth_address,
                     chain_id=chain_id,
                 )
         except Exception:
             logging.warning(
-                "HttpPrivateStockSign: auto stock account setup failed, "
-                "stock operations may not work until credentials are configured manually",
+                "HttpPrivateRwaSign: auto RWA account setup failed, "
+                "RWA operations may not work until credentials are configured manually",
                 exc_info=True,
             )
 
@@ -1173,7 +1173,7 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
         if primary_credentials:
             self.api_key_credentials = primary_credentials
 
-    def transfer_contract_to_stock_v3(
+    def transfer_contract_to_rwa_v3(
             self,
             amount,
             token,
@@ -1181,8 +1181,8 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
             timestampSeconds=None,
     ):
         """
-        Convenience wrapper for contract -> stock transfer using primary API identity.
-        Only amount/token are required; stock receiver info comes from cached stock account.
+        Convenience wrapper for contract -> RWA transfer using primary API identity.
+        Only amount/token are required; RWA receiver info comes from cached RWA account.
         """
         if not self.configV3:
             self.configs_v3()
@@ -1190,15 +1190,15 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
         self.use_primary_account()
         try:
             primary_account = self.get_account_v3(account_type="primary") or {}
-            stock_account = self.get_account_v3_stock() or {}
-            receiver_account_id = stock_account.get('stockAccountId') or stock_account.get('id')
+            rwa_account = self.get_account_v3_rwa() or {}
+            receiver_account_id = rwa_account.get('stockAccountId') or rwa_account.get('id')
             receiver_l2_key = (
-                stock_account.get('l2Key')
-                or stock_account.get('omniSwapAccount', {}).get('l2Key')
+                rwa_account.get('l2Key')
+                or rwa_account.get('omniSwapAccount', {}).get('l2Key')
             )
-            receiver_address = stock_account.get('ethereumAddress') or primary_account.get('ethereumAddress')
+            receiver_address = rwa_account.get('ethereumAddress') or primary_account.get('ethereumAddress')
             if not receiver_account_id or not receiver_l2_key or not receiver_address:
-                raise ValueError('Stock account context is missing receiver details')
+                raise ValueError('RWA account context is missing receiver details')
             return self.create_contract_transfer_to_address_v3(
                 amount=amount,
                 asset=token,
@@ -1211,7 +1211,7 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
         finally:
             self.set_default_account_type(previous_account_type)
 
-    def transfer_stock_to_contract_v3(
+    def transfer_rwa_to_contract_v3(
             self,
             amount,
             token,
@@ -1219,23 +1219,23 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
             timestampSeconds=None,
     ):
         """
-        Convenience wrapper for stock -> contract transfer using stock API identity.
+        Convenience wrapper for RWA -> contract transfer using RWA API identity.
         Only amount/token are required; contract receiver info comes from cached primary account.
         """
         if not self.configV3:
             self.configs_v3()
         previous_account_type = getattr(self, "_default_account_type", "primary")
-        self.set_default_account_type(self.stock_account_type)
-        stock_credentials = self._get_api_credentials(self.stock_account_type)
-        if stock_credentials:
-            self.api_key_credentials = stock_credentials
-        # Ensure signing context uses stock account snapshot.
-        stock_account = self.get_account_v3_stock() or {}
+        self.set_default_account_type(self.rwa_account_type)
+        rwa_credentials = self._get_api_credentials(self.rwa_account_type)
+        if rwa_credentials:
+            self.api_key_credentials = rwa_credentials
+        # Ensure signing context uses RWA account snapshot.
+        rwa_account = self.get_account_v3_rwa() or {}
         current_account_ctx = getattr(self, "accountV3", None)
-        if stock_account:
-            self._set_account_context(stock_account, account_type=self.stock_account_type)
-            self.accountV3 = stock_account
-        stock_account_id = stock_account.get('stockAccountId') or stock_account.get('id')
+        if rwa_account:
+            self._set_account_context(rwa_account, account_type=self.rwa_account_type)
+            self.accountV3 = rwa_account
+        rwa_account_id = rwa_account.get('stockAccountId') or rwa_account.get('id')
         try:
             primary_account = self.get_account_v3(account_type="primary") or {}
             contract_receiver_id = primary_account.get('id')
@@ -1254,7 +1254,7 @@ class HttpPrivateStockSign(HttpPrivateStock_v3, HttpPrivateSign):
                 receiverAddress=contract_receiver_address,
                 clientId=clientId,
                 timestampSeconds=timestampSeconds,
-                accountId=stock_account_id,
+                accountId=rwa_account_id,
             )
         finally:
             # Restore previous account context.
