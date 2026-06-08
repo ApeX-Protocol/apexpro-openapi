@@ -45,6 +45,19 @@ def main():
     )
     print("RWA -> contract transfer response:", rwa_to_contract)
 
+    # Transfer out to external address (from spot account to another address).
+    # Uses primary account credentials and signing seeds.
+    transfer_to_address = client.create_transfer_out_to_address_v3(
+        amount="1",                                          # transfer amount
+        asset="USDT",                                        # token symbol
+        receiverAddress="0xYourReceiverAddress",             # receiver's ethereum address
+        receiverAccountId="receiverAccountId",               # receiver's account ID
+        receiverZkAccountId="receiverZkAccountId",           # receiver's zk account ID
+        receiverSubAccountId=0,                              # receiver's sub account ID (default 0)
+        clientId=random_client_id(),
+    )
+    print("Transfer out to address response:", transfer_to_address)
+
     print("end, Apex Omni RWA transfer demo")
 
 

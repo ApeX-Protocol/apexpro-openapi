@@ -34,10 +34,26 @@ class HttpPrivateSign(HttpPrivate_v3):
     def _ensure_account_snapshot(self, account_type=None):
         account = self._get_account_snapshot(account_type)
         if not account:
+            resolved_type = account_type or getattr(self, "_default_account_type", "primary")
+            if resolved_type == getattr(self, "rwa_account_type", None) and hasattr(self, "get_account_v3_rwa"):
+                account = self.get_account_v3_rwa()
+            else:
+                account = self.get_account_v3(account_type=resolved_type)
+        if not account:
             raise Exception(
-                'No account data cached, please call get_account_v3()'
+                'Failed to fetch account data from server'
             )
         return account
+
+    def _ensure_config_v3(self):
+        if not getattr(self, "configV3", None):
+            if hasattr(self, "configs_v3"):
+                self.configs_v3()
+        if not getattr(self, "configV3", None):
+            raise Exception(
+                'Failed to fetch configV3 from server'
+            )
+        return self.configV3
 
     def create_order_v3(self,
                      symbol,
@@ -96,11 +112,7 @@ class HttpPrivateSign(HttpPrivate_v3):
                 'please call get_account_v3()'
             )
 
-        if not self.configV3:
-            raise Exception(
-                'No config provided' +
-                'please call configs_v3()'
-            )
+        self._ensure_config_v3()
         symbolData = None
         currency = {}
         for k, v in enumerate(self.configV3.get('contractConfig').get('perpetualContract')):
@@ -142,8 +154,15 @@ class HttpPrivateSign(HttpPrivate_v3):
 
 
         subAccountId = 0
-        takerFeeRate = takerFeeRate or account.get('contractAccount').get('takerFeeRate')
-        makerFeeRate = makerFeeRate or account.get('contractAccount').get('makerFeeRate')
+        contractAccount = account.get('contractAccount') or {}
+        takerFeeRate = takerFeeRate or contractAccount.get('takerFeeRate')
+        makerFeeRate = makerFeeRate or contractAccount.get('makerFeeRate')
+        if takerFeeRate is None or makerFeeRate is None:
+            raise Exception(
+                'No contractAccount fee rate found; '
+                'pass takerFeeRate/makerFeeRate explicitly, '
+                'or ensure the account has perpetual trading enabled'
+            )
 
         message = hashlib.sha256()
         message.update(clientId.encode())  # Encode as UTF-8.
@@ -888,6 +907,8 @@ class HttpPrivateSign(HttpPrivate_v3):
 
     def create_batch_orders_v3(self, orders):
         createOrders = []
+        self._ensure_account_snapshot()
+        self._ensure_config_v3()
         for orderModel in orders:
             price = str(orderModel.price)
             size = str(orderModel.size)
@@ -898,12 +919,6 @@ class HttpPrivateSign(HttpPrivate_v3):
                 raise Exception(
                     'No accountId provided' +
                     'please call get_account_v3()'
-                )
-
-            if not self.configV3:
-                raise Exception(
-                    'No config provided' +
-                    'please call configs_v3()'
                 )
             symbolData = None
             currency = {}
@@ -942,8 +957,15 @@ class HttpPrivateSign(HttpPrivate_v3):
 
 
             subAccountId = orderModel.subAccountId or self.accountV3.get('spotAccount').get('defaultSubAccountId')
-            takerFeeRate = orderModel.takerFeeRate or self.accountV3.get('contractAccount').get('takerFeeRate')
-            makerFeeRate = orderModel.makerFeeRate or self.accountV3.get('contractAccount').get('makerFeeRate')
+            contractAccount = self.accountV3.get('contractAccount') or {}
+            takerFeeRate = orderModel.takerFeeRate or contractAccount.get('takerFeeRate')
+            makerFeeRate = orderModel.makerFeeRate or contractAccount.get('makerFeeRate')
+            if takerFeeRate is None or makerFeeRate is None:
+                raise Exception(
+                    'No contractAccount fee rate found; '
+                    'pass takerFeeRate/makerFeeRate on the order model explicitly, '
+                    'or ensure the account has perpetual trading enabled'
+                )
 
             message = hashlib.sha256()
             message.update(clientId.encode())  # Encode as UTF-8.
