@@ -22,6 +22,42 @@ machine will automatically run `make test` first and refuse to push if
 anything fails. CI runs the exact same `make test` target on every PR —
 keeping the local and remote gates identical.
 
+### Releasing
+
+Releases publish to PyPI automatically when a `v*` tag is pushed. The
+release workflow (`.github/workflows/release.yml`) reruns the test gate,
+builds the wheel + sdist, publishes to PyPI via OIDC trusted publishing
+(no long-lived token), and creates a GitHub Release with the artifacts.
+
+To cut a release from `main`:
+
+```bash
+# 1. Bump version in pyproject.toml, open + merge a PR.
+# 2. From the merged main commit:
+git checkout main && git pull
+git tag v3.4.1
+git push origin v3.4.1
+```
+
+The workflow refuses to publish if the tag does not match
+`pyproject.toml`'s `version`, and (if configured) waits on a Required
+reviewer for the `pypi` GitHub Environment before uploading.
+
+#### One-time setup (per project, per release target)
+
+1. **PyPI** — go to https://pypi.org/manage/project/apexomni/settings/publishing/
+   and add a Trusted Publisher with:
+   - Owner: `ApeX-Protocol`
+   - Repository: `apexpro-openapi`
+   - Workflow filename: `release.yml`
+   - Environment name: `pypi`
+
+2. **GitHub** — Settings → Environments → New environment named `pypi`:
+   - (Recommended) Add Required reviewers — every release waits for an
+     approval click before the PyPI upload step runs.
+   - (Recommended) Restrict deployment branches to `main` so a tag from
+     elsewhere can't trigger a release.
+
 ## Installation
 `apex omni` supports Python 3.9 through 3.12. The module can be installed manually or via [apexomni](https://pypi.org/project/apexomni/)  with `pip`:
 ```
