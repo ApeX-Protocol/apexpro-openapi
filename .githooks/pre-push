@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+#
+# Block `git push` if the offline test gate fails.
+#
+# Bypass with `git push --no-verify` only in emergencies — the same checks
+# run again on CI and will fail your PR anyway.
+
+set -euo pipefail
+
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+cd "$REPO_ROOT"
+
+# Pick the Python that has the SDK + pytest installed. Prefer the project
+# venv if present; otherwise fall back to whichever python3 is on PATH.
+if [ -x ".venv/bin/python" ]; then
+  export PYTHON=".venv/bin/python"
+else
+  export PYTHON="$(command -v python3 || command -v python)"
+fi
+
+if [ -z "${PYTHON}" ]; then
+  echo "pre-push: no python interpreter found on PATH" >&2
+  exit 1
+fi
+
+printf '\033[36m── pre-push: running offline tests via `make test` ──\033[0m\n'
+
+if make --silent test; then
+  printf '\033[32m── pre-push: tests passed, push proceeding ──\033[0m\n'
+  exit 0
+fi
+
+printf '\033[31m── pre-push: tests failed, push blocked ──\033[0m\n' >&2
+printf 'Fix the failures above, or rerun with `git push --no-verify` to bypass.\n' >&2
+exit 1

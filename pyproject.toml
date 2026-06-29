@@ -1,55 +1,74 @@
 [build-system]
-requires = ["setuptools>=42", "wheel"]
+requires = ["setuptools>=61", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
 name = "apexomni"
-version = "3.3.1"
+version = "3.4.0"
 description = "Python3 Apexpro omni HTTP/WebSocket API Connector"
-authors = [
-    {name = "Dexter Dickinson", email = "xxx@apexomni.com"}
-]
 readme = "README.md"
-requires-python = ">=3.6"
+license = {text = "MIT"}
+authors = [
+    {name = "Dexter Dickinson", email = "xxx@apexomni.com"},
+]
+keywords = ["apexomni", "apexpro", "api", "connector"]
+requires-python = ">=3.9"
 classifiers = [
     "Development Status :: 4 - Beta",
     "Intended Audience :: Developers",
     "Topic :: Software Development :: Libraries :: Python Modules",
     "License :: OSI Approved :: MIT License",
-    "Programming Language :: Python :: 3.6",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
 ]
 dependencies = [
-    "requests",
+    "requests>=2.32.3,<3.0.0",
     "websocket-client",
     "websockets",
     "dateparser==1.0.0",
     "ecdsa==0.16.0",
     "eth_keys",
     "eth-account==0.13.7",
+    "mnemonic",
     "mpmath==1.0.0",
-    "pytest>=4.4.0,<5.0.0",
-    "requests-mock==1.6.0",
-    "requests>=2.32.3,<3.0.0",
-    "setuptools>=50.3.2",
+    "numpy",
+    # setuptools<81 keeps pkg_resources, which web3==6.0.0 imports at module load.
+    "setuptools>=50.3.2,<81",
     "sympy==1.6",
-    "tox==3.13.2",
     "web3==6.0.0",
 ]
+
+[project.optional-dependencies]
+demos = ["python-dotenv>=1.0.0"]
+tests = ["pytest>=7"]
+
+[project.urls]
+Homepage = "https://github.com/ApeX-Protocol/apexpro-openapi"
+
+[tool.setuptools]
+zip-safe = false
+
+[tool.setuptools.packages.find]
+include = ["apexomni*"]
+exclude = ["tests*"]
+
+[tool.setuptools.package-data]
+"*" = ["*.json", "*.dylib", "*.dll", "*.so"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-ra -q"
+python_functions = ["test_*"]
+norecursedirs = ["legacy", ".venv", "build", "dist"]
+# Disable the web3 pytest_ethereum plugin — it's broken on newer eth_typing
+# and has nothing to do with this SDK's tests.
+addopts = "-p no:pytest_ethereum"
 
 [tool.black]
 line-length = 88
-target-version = ['py36', 'py37', 'py38', 'py39', 'py310', 'py311', 'py312']
+target-version = ["py39", "py310", "py311", "py312"]
 include = '\.pyi?$'
 
 [tool.isort]
