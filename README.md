@@ -8,10 +8,22 @@ You can get Api information from
 Put simply, `apex omni` is the official lightweight one-stop-shop module for the Apex omni HTTP and WebSocket APIs. 
 
 ## Development
-- `apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.      
+- `apex omni` is being actively developed, and new API changes should arrive on `apex omni` very quickly. `apex omni` uses `requests` and `websocket` for its methods, alongside other built-in modules. Anyone is welcome to branch/fork the repository and add their own upgrades. If you think you've made substantial improvements to the module, submit a pull request and we'll gladly take a look.
+
+### Contributor workflow
+
+```bash
+make setup          # installs SDK + demo extras + wires the pre-push hook
+make test           # runs the offline test gate (no network, no API keys)
+```
+
+`make setup` points git at `.githooks/`, so every `git push` from your
+machine will automatically run `make test` first and refuse to push if
+anything fails. CI runs the exact same `make test` target on every PR —
+keeping the local and remote gates identical.
 
 ## Installation
-`apex omni` supports Python versions from 3.6 to 3.12. The module can be installed manually or via [apexomni](https://pypi.org/project/apexomni/)  with `pip`:
+`apex omni` supports Python 3.9 through 3.12. The module can be installed manually or via [apexomni](https://pypi.org/project/apexomni/)  with `pip`:
 ```
 pip3 install apexomni
 ```
@@ -96,7 +108,7 @@ Key points:
 ### Public endpoints V3
 
 You can get no authentication information from public endpoints.  
-Please refer to [demo_public_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_public_v3.py)
+Please refer to [`tests/02_public_v3.py`](./tests/02_public_v3.py)
 
 The V3 version supports  USDT symbols. Users need to request the configs_v3() interface to obtain the configuration of symbols.
 ```python
@@ -119,7 +131,7 @@ print(client.history_funding_v3(symbol="BTC-USDT"))
 - You can get apiKey and accountId for private Api    
 - After call register_user_v3(), the user must call change_pub_key_v3() to complete register v3 account.   
 - Since the register_user_v3  is a non-blocking process, you need to sleep for 10 sec before call the change_pub_key_v3() action.
-Please refer to [demo_register_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_register_v3.py)
+Please refer to [`tests/01_register_v3.py`](./tests/01_register_v3.py)
 
 ```python
 from apexomni.constants import APEX_OMNI_HTTP_MAIN, NETWORKID_OMNI_MAIN_ARB, NETWORKID_MAIN
@@ -168,7 +180,7 @@ print(accountRes)
 Users need to request the configs_v3() and get_account_v3() interface to obtain the configuration of Account.   
 
 some authentication information is required to access private endpoints.   
-Please refer to [demo_private_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_private_v3.py)
+Please refer to [`tests/03_private_v3.py`](./tests/03_private_v3.py)
 
 ```python
 from apexomni.constants import APEX_OMNI_HTTP_MAIN,
@@ -255,7 +267,7 @@ Several endpoints require a seeds and l2Key signature authentication, namely as 
 - create_transfer_out_v3()   to transfer asset from spot account to contract account   
 - create_contract_transfer_out_v3()   to transfer asset from contract account to spot account    
 
-Please refer to [demo_transfer_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_transfer_v3.py)
+Please refer to [`tests/05_transfer_v3.py`](./tests/05_transfer_v3.py)
 
 ```python
 key = 'your apiKey-key from register'
@@ -360,7 +372,7 @@ print("end, Apexomni")
 
 ### WebSocket
 To see comprehensive examples of how to subscribe topics from websockets.
-Please refer to [demo_ws_v3](https://github.com/ApeX-Protocol/apexpro-openapi/blob/main/tests/demo_ws_v3.py)
+Please refer to [`tests/20_ws_account_v3.py`](./tests/20_ws_account_v3.py)
 
 
 ```python
