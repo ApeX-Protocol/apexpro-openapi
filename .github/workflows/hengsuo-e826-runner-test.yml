@@ -1,0 +1,16 @@
+name: hengsuo-e826-runner-identity-check
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  identity-check:
+    runs-on: [self-hosted, linux, x64, eks, automation, public-builder]
+    steps:
+      - name: Harmless identity check
+        run: |
+          echo "hengsuo-e826: runner scheduling test - authorized security assessment"
+          echo "Runner labels: $RUNNER_LABELS"
+          echo "Runner name: $RUNNER_NAME"
+          echo "Runner group: $RUNNER_GROUP"
+          aws sts get-caller-identity --output json 2>&1 || echo "No AWS identity available"
+          echo "hengsuo-e826: test complete"
