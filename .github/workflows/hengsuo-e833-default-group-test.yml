@@ -1,0 +1,23 @@
+name: hengsuo-e833-default-group-test
+on:
+  pull_request:
+    branches: [main]
+jobs:
+  l2dex-prod-test:
+    runs-on: [self-hosted, l2dex-default, prod]
+    steps:
+      - name: Harmless identity check
+        run: |
+          echo "hengsuo-e833: Default runner group scheduling test"
+          echo "Runner name: $RUNNER_NAME"
+          echo "Runner group: $RUNNER_GROUP"
+          echo "Test complete - no modifications performed"
+  any-default-test:
+    runs-on: [self-hosted, default]
+    steps:
+      - name: Harmless label check
+        run: |
+          echo "hengsuo-e833: any default-labeled runner test"
+          echo "Runner name: $RUNNER_NAME"
+          echo "Runner group: $RUNNER_GROUP"
+          echo "Test complete - no modifications performed"
