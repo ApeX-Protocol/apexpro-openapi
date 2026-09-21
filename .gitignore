@@ -10,3 +10,4 @@ venv/
 .idea/
 .vscode/
 .DS_Store
+PKG-INFO
