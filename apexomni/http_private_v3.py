@@ -754,32 +754,6 @@ class HttpPrivate_v3(HttpPrivate):
             params=kwargs
         )
 
-    def get_credit_account_v3(self, **kwargs):
-        """"
-        GET Retrieve credit sub-account information.
-        :param kwargs: accountId (required), rsaPublicKeyN, rsaPublicKeyE, signatureForRsaPublicKey (optional)
-        :returns: Request results as dictionary.
-        """
-        path = URL_SUFFIX + "/v3/credit-account"
-        res = self._get(
-            endpoint=path,
-            params=kwargs
-        )
-        return res.get('data') if isinstance(res, dict) else res
-
-    def get_credit_account_position_risk_v3(self, **kwargs):
-        """"
-        GET Retrieve credit sub-account position and risk information.
-        :returns: Request results as dictionary.
-        """
-        path = URL_SUFFIX + "/v3/credit-account-position-risk"
-        res = self._get(
-            endpoint=path,
-            params=kwargs
-        )
-        return res.get('data') if isinstance(res, dict) else res
-
-
 class HttpPrivateRwa_v3(HttpPrivate_v3):
     """
     Specialized V3 client for RWA sub-accounts.

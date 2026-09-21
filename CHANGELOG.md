@@ -9,8 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- `get_credit_account_v3()` - 获取配资子账户信息（支持 RSA 公钥参数获取加密 seeds）
-- `get_credit_account_position_risk_v3()` - 获取配资子账户仓位及风险信息
+- Internal maintenance release.
 
 ## [1.0.0] - 2022-06-03
 

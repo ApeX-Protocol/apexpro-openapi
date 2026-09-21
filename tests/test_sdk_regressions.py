@@ -34,7 +34,6 @@ def test_rwa_subclass_inherits_change_pub_key_v3():
 @pytest.mark.parametrize("method", [
     "transfer_v3", "fills_v3", "open_orders_v3", "delete_order_v3",
     "withdraw_fee_v3", "all_apikeys_v3", "generate_api_key_v3",
-    "get_credit_account_v3",
 ])
 def test_generic_methods_on_httpprivate_v3(method):
     """A spot-check that the rest of the moved methods landed on the parent."""
